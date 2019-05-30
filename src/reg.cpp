@@ -2,6 +2,9 @@
 
 using namespace std;
 
+Reg::Reg(){}
+Reg::~Reg(){}
+
 int Reg::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
     if (flag.compare("-s")) {
@@ -11,4 +14,5 @@ int Reg::getArguments(int argc, char *argv[])  {
     } else {
         cout << "incorrect flag" << endl;
     }
+    return 0;
 }

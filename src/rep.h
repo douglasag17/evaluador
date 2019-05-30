@@ -5,5 +5,7 @@
 
 class Rep {
     public: 
+    Rep();
+    ~Rep();
     int getArguments(int argc, char *argv[]);
 };

@@ -5,5 +5,7 @@
 
 class Reg {
     public: 
+    Reg();
+    ~Reg();
     int getArguments(int argc, char *argv[]);
 };

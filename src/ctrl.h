@@ -5,5 +5,7 @@
 
 class Ctrl {
     public: 
+    Ctrl();
+    ~Ctrl();
     int getArguments(int argc, char *argv[]);
 };

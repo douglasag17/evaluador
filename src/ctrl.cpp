@@ -2,6 +2,9 @@
 
 using namespace std;
 
+Ctrl::Ctrl(){}
+Ctrl::~Ctrl(){}
+
 int Ctrl::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
     if (flag.compare("-s")) {
@@ -11,4 +14,5 @@ int Ctrl::getArguments(int argc, char *argv[])  {
     } else {
         cout << "incorrect flag" << endl;
     }
+    return 0;
 }
