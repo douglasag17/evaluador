@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "init.h"
-//#include "reg.h"
+#include "reg.h"
 #include "ctrl.h"
 //#include "rep.h"
 
@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
     if (cmd.compare("init") == 0) {
         Init init;
         init.getArguments(argc, argv);
-        cout << "entreee" << endl;
     } else if (cmd.compare("reg") == 0) {
-        cout << argv[2] << endl;
+        Reg reg;
+        reg.getArguments(argc, argv);
     } else if (cmd.compare("ctrl") == 0) {
         Ctrl ctrl;
         ctrl.getArguments(argc, argv);
