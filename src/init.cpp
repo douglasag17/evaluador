@@ -1,4 +1,5 @@
 #include "init.h"
+#include "struct.h"
 
 using namespace std;
 
@@ -61,6 +62,30 @@ int Init::getArguments(int argc, char *argv[]) {
                 }
             }
         }
+        int fd = shm_open(&n_rec[0u], O_RDWR | O_CREAT | O_EXCL, 0660);
+
+        if (fd < 0) {
+            cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
+            exit(1);
+        }
+        if (ftruncate(fd, (sizeof(struct queues) * i_rec * ie_rec) + sizeof(struct queues) * oe_rec) != 0) {
+            cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
+            exit(1);
+        }
+        void *dir;
+        if ((dir = mmap(NULL, sizeof(struct exam), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+            cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
+            exit(1);
+        }
+
+        struct exam *pExam = (struct exam *) dir;
+        pExam -> b = b_rec;
+        pExam -> d = d_rec;
+        pExam -> s = s_rec;
+        pExam -> ie = ie_rec;
+        pExam -> oe = oe_rec;
+
+        close(fd);
     } else {
         cout << "Invalid number of arguments." << endl;
     }

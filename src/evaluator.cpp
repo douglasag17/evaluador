@@ -6,7 +6,8 @@
 #include "init.h"
 #include "reg.h"
 #include "ctrl.h"
-//#include "rep.h"
+#include "rep.h"
+#include "stop.h"
 
 using namespace std;
 
@@ -22,7 +23,11 @@ int main(int argc, char *argv[]) {
         Ctrl ctrl;
         ctrl.getArguments(argc, argv);
     } else if (cmd.compare("rep") == 0) {
-        cout << argv[2] << endl;
+        Rep rep;
+        rep.getArguments(argc, argv);
+    } else if (cmd.compare("stop") == 0) {
+        Stop stop;
+        stop.getArguments(argv);
     } else {
         cout << "command not found" << endl;
     }

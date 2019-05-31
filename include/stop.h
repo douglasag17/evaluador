@@ -10,9 +10,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-class Init {
+class Stop {
     public: 
-    Init();
-    ~Init();
-    int getArguments(int argc, char *argv[]);
+    Stop();
+    ~Stop();
+    int getArguments(char *argv[]);
 };

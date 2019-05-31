@@ -1,7 +1,7 @@
 SRCDIR   := src
 BINDIR   := bin
-CXXFLAGS := -std=c++11 -I include
-#-pedantic-errors -Wall -Wextra 
+LDFLAGS  := -pthread	
+CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++11 -I include
 all: dirs $(BINDIR)/evaluator
 
 VPATH := src include bin
@@ -18,10 +18,13 @@ $(SRCDIR)/ctrl.o: ctrl.cpp ctrl.h
 $(SRCDIR)/rep.o: rep.cpp rep.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-$(BINDIR)/evaluator: evaluator.o init.o reg.o ctrl.o rep.o
-	$(CXX) -o $@ $^
+$(SRCDIR)/stop.o: stop.cpp stop.h
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
+
+$(BINDIR)/evaluator: evaluator.o init.o reg.o ctrl.o rep.o stop.o
+	$(CXX) -o $@ $(LDFLAGS) $^ -lrt
 	
-$(SRCDIR)/evaluator.o: evaluator.cpp init.h reg.h ctrl.h rep.h
+$(SRCDIR)/evaluator.o: evaluator.cpp init.h reg.h ctrl.h rep.h stop.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 .PHONY: clean

@@ -7,7 +7,7 @@ Rep::~Rep(){}
 
 int Rep::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
-    if (flag.compare("-s")) {
+    if (flag.compare("-n")) {
         string nameShareMem = argv[3];
         // Interactive mode, subcmds: list, update
         

@@ -7,7 +7,7 @@ Ctrl::~Ctrl(){}
 
 int Ctrl::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
-    if (flag.compare("-s") == 0) {
+    if (flag.compare("-n") == 0) {
         // ¿hay que comparar nameShareMem con -n del init?
         string nameShareMem;
         if(argc == 3){
