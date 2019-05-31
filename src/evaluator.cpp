@@ -5,7 +5,7 @@
 
 #include "init.h"
 //#include "reg.h"
-//#include "ctrl.h"
+#include "ctrl.h"
 //#include "rep.h"
 
 using namespace std;
@@ -19,7 +19,8 @@ int main(int argc, char *argv[]) {
     } else if (cmd.compare("reg") == 0) {
         cout << argv[2] << endl;
     } else if (cmd.compare("ctrl") == 0) {
-        cout << argv[2] << endl;
+        Ctrl ctrl;
+        ctrl.getArguments(argc, argv);
     } else if (cmd.compare("rep") == 0) {
         cout << argv[2] << endl;
     } else {
