@@ -1,10 +1,10 @@
 SRCDIR   := src
 BINDIR   := bin
-CXXFLAGS := -std=c++11 -I src
+CXXFLAGS := -std=c++11 -I include
 #-pedantic-errors -Wall -Wextra 
 all: dirs $(BINDIR)/evaluator
 
-VPATH := src bin
+VPATH := src include bin
 
 $(SRCDIR)/init.o: init.cpp init.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<

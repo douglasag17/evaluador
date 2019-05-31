@@ -47,12 +47,6 @@ int Init::getArguments(int argc, char *argv[]) {
                 } else {
                     d_rec = 100;
                 }
-            } else if(opt.compare("-ee") == 0) {
-                if(argv[i+1][0] != '-') {
-                    cout << "undefined" << endl;
-                } else {
-                    cout << "undefined" << endl;
-                }
             } else if(opt.compare("-s") == 0) {
                 if(argv[i+1][0] != '-'){
                     s_rec = atoi(argv[i+1]);

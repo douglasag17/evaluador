@@ -9,14 +9,18 @@ int Ctrl::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
     if (flag.compare("-s") == 0) {
         // ¿hay que comparar nameShareMem con -n del init?
-        string nameShareMem = argv[3];
+        string nameShareMem;
+        if(argc == 3){
+            nameShareMem = "evaluator";
+        }else{
+            nameShareMem = argv[3];
+        }
         // Interactive mode, subcmds: list, update
-        while (true) {
-            string sub_cmd;
+        string sub_cmd;
+        cout << "> ";
+        while (getline(cin, sub_cmd)) {
             char *sample;
             int reactive_level;
-            cout << "> ";
-            getline(cin, sub_cmd);
             if (sub_cmd.compare("list processing") == 0) {
                 cout << "processing" << endl;
             } else if (sub_cmd.compare("list waiting") == 0) {
@@ -43,6 +47,7 @@ int Ctrl::getArguments(int argc, char *argv[])  {
             } else {
                 cout << "command not found" << endl;
             }
+            cout << "> ";
         }
         
     } else {
