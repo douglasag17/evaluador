@@ -48,17 +48,30 @@ int Reg::getArguments(int argc, char *argv[])  {
             if (nameShareMem.find(".") != string::npos || nameShareMem.compare("evaluator") == 0){
                 nameShareMem = "evaluator";
                 for(int i = 3; i < argc; ++i){
-                    cout << argv[i] << endl;
+                    //cout << argv[i] << endl;
+                    string line;
+                    ifstream myfile (argv[i]);
+                    if (myfile.is_open()) {
+                        while ( getline (myfile,line) ) {
+                            cout << line << '\n';
+                        }
+                        myfile.close();
+                    } else cout << "Unable to open file";
                 }   
             }else{
                 for(int i = 4; i < argc; ++i){
-                    cout << argv[i] << endl;
+                    //cout << argv[i] << endl;
+                    string line;
+                    ifstream myfile (argv[i]);
+                    if (myfile.is_open()) {
+                        while ( getline (myfile,line) ) {
+                            cout << line << '\n';
+                        }
+                        myfile.close();
+                    } else cout << "Unable to open file";
                 }     
             }
-            cout << "name -> " <<nameShareMem << endl;
         }
-        
-        
     } else {
         cout << "incorrect flag" << endl;
     }
