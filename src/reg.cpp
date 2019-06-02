@@ -71,9 +71,9 @@ int Reg::getArguments(int argc, char *argv[])  {
                             // verificar inbox menor que i-1
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
-                            }//else{
-                             //   openMem(nameShareMem, inbox, sample, amount_sample);
-                            //}
+                            }else{
+                                openMem(nameShareMem, inbox, sample, amount_sample);
+                            }
                         }
                         myfile.close();
                     }
@@ -102,9 +102,9 @@ int Reg::getArguments(int argc, char *argv[])  {
                             // verificar inbox menor que i-1
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
-                            }//else{
-                            //    openMem(nameShareMem, inbox, sample, amount_sample);
-                            //}
+                            }else{
+                                openMem(nameShareMem, inbox, sample, amount_sample);
+                            }
                         }
                         myfile.close();
                     }
@@ -119,19 +119,17 @@ int Reg::getArguments(int argc, char *argv[])  {
 
 void Reg::openMem(string nameShareMem, int inbox, char *sample, int amount_sample){
     int id  = Reg::id;
-    cout << id << endl;
-    cout << nameShareMem << inbox << sample << amount_sample << endl;
-    /*int fd = shm_open(&nameShareMem[0u], O_RDWR, 0660);
+    //cout << id << nameShareMem << inbox << sample << amount_sample << endl;
+    int fd = shm_open(&nameShareMem[0u], O_RDWR, 0660);
     if (fd < 0) {
-        cerr << "Error abriendo la memoria compartida: "
-        << errno << strerror(errno) << endl;
+        cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
         exit(1);
-    }*/
+    }
 
-    /*void *dir;
+    void *dir;
     if ((dir = mmap(NULL, sizeof(struct exam), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
         cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
         exit(1);
-    }*/
+    }
     Reg::id++;
 }
