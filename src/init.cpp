@@ -7,7 +7,7 @@ Init::Init(){}
 Init::~Init(){}
 
 int Init::getArguments(int argc, char *argv[]) {
-    int i_rec, ie_rec, oe_rec, b_rec, d_rec, ee_rec, s_rec, q_rec;
+    int i_rec, ie_rec, oe_rec, b_rec, d_rec, s_rec, q_rec;
     string n_rec;
     if(argc >= 10) {
         for(int i = 1; i < argc; ++i) {

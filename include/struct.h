@@ -8,8 +8,9 @@ using namespace std;
 struct exam {
   int id; // identificador
   int i; // cola de entrada
-  int k; // tipo de muestra
+  char k; // tipo de muestra
   int q; // cantidad de muestra
+  
   char r; // informe final de la muestra
   int p; // tiempo de procesamiento en segundos
 

@@ -5,6 +5,8 @@ using namespace std;
 Reg::Reg(){}
 Reg::~Reg(){}
 
+string ids_file = "";
+
 int Reg::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
     if (flag.compare("-n") == 0) {
@@ -37,11 +39,11 @@ int Reg::getArguments(int argc, char *argv[])  {
                 }
                 sample = arr[0];
                 amount_sample = atoi(arr[1]);
-                // verificar inbox menor que i-1
+                // verificar inbox menor que i-1 y que el tipo de muestra sea B D S
                 if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                     cout << "invalid parameters" << endl;
                 }else{
-                    openMem(nameShareMem, inbox, sample, amount_sample);
+                    openMem(false, nameShareMem,inbox, sample, amount_sample);
                 }
                 cout << "> ";
             }
@@ -68,13 +70,19 @@ int Reg::getArguments(int argc, char *argv[])  {
                             }
                             sample = arr[0];
                             amount_sample = atoi(arr[1]);
-                            // verificar inbox menor que i-1
+                            // verificar inbox menor que i-1 y que el tipo de muestra sea B D S
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                openMem(nameShareMem, inbox, sample, amount_sample);
+                                openMem(true ,nameShareMem, inbox, sample, amount_sample);
                             }
                         }
+                        ofstream outFile;
+                        string nameFile = argv[i];
+                        nameFile = nameFile.substr(0, nameFile.find(".")) + ".spl";
+                        outFile.open(nameFile);
+                        outFile << ids_file;
+                        outFile.close();
                         myfile.close();
                     }
                 }   
@@ -99,13 +107,19 @@ int Reg::getArguments(int argc, char *argv[])  {
                             }
                             sample = arr[0];
                             amount_sample = atoi(arr[1]);
-                            // verificar inbox menor que i-1
+                            // verificar inbox menor que i-1 y que el tipo de muestra sea B D S
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                openMem(nameShareMem, inbox, sample, amount_sample);
+                                openMem(true, nameShareMem, inbox, sample, amount_sample);
                             }
                         }
+                        ofstream outFile;
+                        string nameFile = argv[i];
+                        nameFile = nameFile.substr(0, nameFile.find(".")) + ".spl";
+                        outFile.open(nameFile);
+                        outFile << ids_file;
+                        outFile.close();
                         myfile.close();
                     }
                 }     
@@ -117,9 +131,11 @@ int Reg::getArguments(int argc, char *argv[])  {
     return 0;
 }
 
-void Reg::openMem(string nameShareMem, int inbox, char *sample, int amount_sample){
-    int id  = Reg::id;
-    //cout << id << nameShareMem << inbox << sample << amount_sample << endl;
+void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int amount_sample){
+    int id = Reg::id;
+    if (isFile) { 
+        ids_file += to_string(id) + "\n";
+    } else cout << id << endl;
     int fd = shm_open(&nameShareMem[0u], O_RDWR, 0660);
     if (fd < 0) {
         cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
@@ -131,5 +147,14 @@ void Reg::openMem(string nameShareMem, int inbox, char *sample, int amount_sampl
         cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
         exit(1);
     }
+
+    struct exam *pExam = (struct exam *) dir;
+    pExam -> id = id;
+    pExam -> i = inbox; 
+    pExam -> k = sample[0u];
+    pExam -> q = amount_sample;
+
+    
+
     Reg::id++;
 }
