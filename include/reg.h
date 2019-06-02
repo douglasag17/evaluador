@@ -10,4 +10,6 @@ class Reg {
     Reg();
     ~Reg();
     int getArguments(int argc, char *argv[]);
+    //void openMem(string nameShareMem, int inbox, 
+        //int amount_sample, char *sample);
 };

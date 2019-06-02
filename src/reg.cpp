@@ -52,11 +52,28 @@ int Reg::getArguments(int argc, char *argv[])  {
                     string line;
                     ifstream myfile (argv[i]);
                     if (myfile.is_open()) {
-                        while ( getline (myfile,line) ) {
-                            cout << line << '\n';
+                        while ( getline (myfile, line) ) {
+                            char *arr[2];
+                            char * pch;
+                            int j = 0;
+                            int inbox, amount_sample;
+                            char *sample;
+                            pch = strtok(&line[0u], " ");
+                            inbox = atoi(pch);
+                            while (pch != NULL) {
+                                pch = strtok (NULL, " ");
+                                arr[j] = pch;
+                                j++;
+                            }
+                            sample = arr[0];
+                            amount_sample = atoi(arr[1]);
+                            // verificar inbox menor que i-1
+                            if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
+                                cout << "invalid parameters" << endl;
+                            }
                         }
                         myfile.close();
-                    } else cout << "Unable to open file";
+                    }
                 }   
             }else{
                 for(int i = 4; i < argc; ++i){
@@ -65,10 +82,27 @@ int Reg::getArguments(int argc, char *argv[])  {
                     ifstream myfile (argv[i]);
                     if (myfile.is_open()) {
                         while ( getline (myfile,line) ) {
-                            cout << line << '\n';
+                            char *arr[2];
+                            int j = 0;
+                            char * pch;
+                            int inbox, amount_sample;
+                            char *sample;
+                            pch = strtok(&line[0u], " ");
+                            inbox = atoi(pch);
+                            while (pch != NULL) {
+                                pch = strtok (NULL, " ");
+                                arr[j] = pch;
+                                j++;
+                            }
+                            sample = arr[0];
+                            amount_sample = atoi(arr[1]);
+                            // verificar inbox menor que i-1
+                            if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
+                                cout << "invalid parameters" << endl;
+                            }
                         }
                         myfile.close();
-                    } else cout << "Unable to open file";
+                    }
                 }     
             }
         }
