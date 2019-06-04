@@ -1,7 +1,7 @@
 SRCDIR   := src
 BINDIR   := bin
 LDFLAGS  := -pthread	
-CXXFLAGS := -pedantic-errors -Wall -Wextra -std=c++11 -I include
+CXXFLAGS := -Wall -Wextra -std=c++11 -I include
 all: dirs $(BINDIR)/evaluator
 
 VPATH := src include bin
