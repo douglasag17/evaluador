@@ -83,21 +83,10 @@ int Init::getArguments(int argc, char *argv[]) {
         pExam -> b = b_rec;
         pExam -> d = d_rec;
         pExam -> s = s_rec;
-        //pExam -> ie = ie_rec;
-        //pExam -> oe = oe_rec;s
-        queues *cola2 [i_rec+1];
-        for (int i = 0; i < i_rec+1; i++) {
-            if (i == i_rec) {
-                cola2[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * i_rec -1));
-                cola2[i]->size = oe_rec;
-            } else {
-                cola2[i] = (struct queues*) ((char*) dir  + (sizeof(struct queues) * i));
-                cola2[i]->size = ie_rec;
-            }
-            cout << cola2[i]->size << endl;
-        }
-        
-        cout << cola2[1]->size << endl;
+        pExam -> ie = ie_rec;
+        pExam -> oe = oe_rec;
+        pExam -> i_rec = i_rec;
+
         close(fd);
     } else {
         cout << "Invalid number of arguments." << endl;

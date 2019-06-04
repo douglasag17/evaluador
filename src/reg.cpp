@@ -130,6 +130,8 @@ int Reg::getArguments(int argc, char *argv[])  {
     return 0;
 }
 
+//void Reg::
+
 void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int amount_sample){
     int id = Reg::id;
     if (isFile) { 
@@ -152,6 +154,23 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
     pExam -> i = inbox; 
     pExam -> k = sample[0u];
     pExam -> q = amount_sample;
+
+
+    //Code to create and initialize queues
+    int i_rec = pExam -> i_rec;
+    queues *colas[i_rec + 1];
+    for (int i = 0; i < i_rec+1; i++) {
+        if (i == i_rec) {
+            colas[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * i_rec -1));
+            colas[i]->size = pExam -> oe;
+        } else {
+            colas[i] = (struct queues*) ((char*) dir  + (sizeof(struct queues) * i));
+            colas[i]->size = pExam -> ie;
+        }
+    }
+
+
+    //colas[inbox]->cola.push(pExam);
 
     Reg::id++;
 }

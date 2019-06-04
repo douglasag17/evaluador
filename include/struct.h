@@ -18,12 +18,13 @@ struct exam {
   int d; // nivel de reactivo de detritos
   int s; // nivel de reactivo de piel
 
-  //int ie; // numero posiciones en cada cola de entrada
-  //int oe; // numero posiciones en la cola de salida
+  int i_rec;// numero de colas de entrada
+  int ie; // numero posiciones en cada cola de entrada
+  int oe; // numero posiciones en la cola de salida
 };
 
 struct queues {
-    sem_t mutex;
-    int size;
-    queue <exam> cola; 
+  sem_t mutex;
+  int size;
+  queue <exam> cola;  
 };
