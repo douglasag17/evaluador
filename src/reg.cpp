@@ -150,18 +150,22 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
     }
 
     struct exam *pExam = (struct exam *) dir;
-    pExam -> id = id;
+    /*pExam -> id = id;
     pExam -> i = inbox; 
     pExam -> k = sample[0u];
-    pExam -> q = amount_sample;
-
+    pExam -> q = amount_sample;*/
+    exam examen;
+    examen.id = id;
+    examen.i = inbox;
+    examen.k = sample[0u];
+    examen.q = amount_sample;
 
     //Code to create and initialize queues
     int i_rec = pExam -> i_rec;
     queues *colas[i_rec + 1];
     for (int i = 0; i < i_rec+1; i++) {
         if (i == i_rec) {
-            colas[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * i_rec -1));
+            colas[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * (i_rec -1)));
             colas[i]->size = pExam -> oe;
         } else {
             colas[i] = (struct queues*) ((char*) dir  + (sizeof(struct queues) * i));
@@ -169,8 +173,9 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
         }
     }
 
-
-    //colas[inbox]->cola.push(pExam);
+    colas[inbox]->cola.push(examen);
+    cout << colas[inbox]->cola.front().id << colas[inbox]->cola.front().k << endl;
+    colas[inbox]->cola.pop();
 
     Reg::id++;
 }
