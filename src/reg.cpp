@@ -88,7 +88,6 @@ int Reg::getArguments(int argc, char *argv[])  {
                 }   
             }else{
                 for(int i = 4; i < argc; ++i){
-                    //cout << argv[i] << endl;
                     string line;
                     ifstream myfile (argv[i]);
                     if (myfile.is_open()) {
@@ -153,8 +152,6 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
     pExam -> i = inbox; 
     pExam -> k = sample[0u];
     pExam -> q = amount_sample;
-
-    
 
     Reg::id++;
 }
