@@ -69,7 +69,7 @@ int Init::getArguments(int argc, char *argv[]) {
             cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
-        if (ftruncate(fd, (sizeof(struct queues) * i_rec * ie_rec) + sizeof(struct queues) * oe_rec) != 0) {
+        if (ftruncate(fd, (sizeof(struct queues) * i_rec * ie_rec) + sizeof(struct queues) * oe_rec + sizeof(struct exam) != 0)) {
             cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
@@ -91,5 +91,6 @@ int Init::getArguments(int argc, char *argv[]) {
     } else {
         cout << "Invalid number of arguments." << endl;
     }
+    for(;;);
     return 0;
 }

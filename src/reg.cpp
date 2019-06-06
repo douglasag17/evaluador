@@ -149,33 +149,31 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
         exit(1);
     }
 
+    //Code to create and initialize queues
     struct exam *pExam = (struct exam *) dir;
-    /*pExam -> id = id;
-    pExam -> i = inbox; 
-    pExam -> k = sample[0u];
-    pExam -> q = amount_sample;*/
+    int i_rec = pExam -> i_rec;
+    queues *colas[i_rec + 1];
+    for (int i = 0; i < i_rec+1; ++i) {
+        if (i == i_rec) {
+            colas[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * (i_rec -1)));
+            colas[i]->size = pExam -> oe;
+        } else {
+            colas[i] = (struct queues*) ((char*) dir  + (sizeof(struct queues)));
+            colas[i]->size = pExam -> ie;
+        }
+    }
     exam examen;
     examen.id = id;
     examen.i = inbox;
     examen.k = sample[0u];
     examen.q = amount_sample;
-
-    //Code to create and initialize queues
-    int i_rec = pExam -> i_rec;
-    queues *colas[i_rec + 1];
-    for (int i = 0; i < i_rec+1; i++) {
-        if (i == i_rec) {
-            colas[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * (i_rec -1)));
-            colas[i]->size = pExam -> oe;
-        } else {
-            colas[i] = (struct queues*) ((char*) dir  + (sizeof(struct queues) * i));
-            colas[i]->size = pExam -> ie;
-        }
-    }
-
+    //node *tmp = x.front();
     colas[inbox]->cola.push(examen);
-    cout << colas[inbox]->cola.front().id << colas[inbox]->cola.front().k << endl;
-    colas[inbox]->cola.pop();
+
+    /*for(int i = 0; i < colas[inbox]->cola.size();++i){
+        cout << colas[inbox]->cola.front().id << colas[inbox]->cola.front().k << endl;
+        colas[inbox]->cola.pop();
+    }*/
 
     Reg::id++;
 }
