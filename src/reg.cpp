@@ -135,7 +135,7 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
     if (isFile) { 
         ids_file += to_string(id) + "\n";
     } else cout << id << endl;
-    int fd = shm_open(&nameShareMem[0u], O_RDWR, 0660);
+    int fd = shm_open(nameShareMem.c_str(), O_RDWR, 0660);
     if (fd < 0) {
         cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
         exit(1);
@@ -147,13 +147,23 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
         exit(1);
     }
 
-    //Code to create and initialize queues
     struct Header *pHeader = (struct Header *) dir;
     int i_rec = pHeader -> i;
-    Exam **bandejas = new Exam *[pHeader->i * pHeader->ie];
-    bandejas[0] = (struct Exam*) ((char *) pHeader) + sizeof(pHeader);
+    int oe_rec = pHeader ->oe;
+    int ie_rec = pHeader -> ie;
+    munmap(dir, sizeof(struct Header));
+
+    if ((dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+        cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
+        exit(1);
+    }
+
+    //Code to create and initialize queues
+    Exam *colas[i_rec];
+    //Exam **bandejas = new Exam *[pHeader->i];
+    colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
     for(int i = 1; i < i_rec; i++){
-        bandejas[i] = (struct Exam*) (bandejas[i-1]) + (sizeof(bandejas) * pHeader->ie);
+        colas[i] = (struct Exam*) ((char *)colas[i-1]) + (sizeof(struct Exam) * ie_rec);
     }
 
     Exam examen;
@@ -161,14 +171,11 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
     examen.i = inbox;
     examen.k = sample[0u];
     examen.q = amount_sample;
-    bandejas[inbox] = &examen;
+    colas[inbox] = &examen;
 
-    cout << bandejas[inbox]->i << bandejas[inbox]->id << bandejas[inbox]->k << bandejas[inbox]->q << endl;
-
+    cout << colas[inbox]->i << colas[inbox]->id << colas[inbox]->k << colas[inbox]->q << endl;
     Reg::id++;
 }
-
-
 /*queues *colas[i_rec + 1];
 for (int i = 0; i < i_rec+1; ++i) {
     if (i == i_rec) {
