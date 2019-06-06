@@ -90,16 +90,31 @@ int Init::getArguments(int argc, char *argv[]) {
 
         close(fd);
 
-        string semname = "semaforo";
-        sem_t **arraySem = new sem_t *[i_rec*3];
-        for (int j = 0; j < i_rec*3; j++) {
+        string semname = "vacios";
+        sem_t **arraySemVacios = new sem_t *[i_rec];
+        for (int j = 0; j < i_rec; j++) {
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySem[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
-            if (arraySem[j] == SEM_FAILED) {
-                cerr << "Error " << endl;
-            }
+            arraySemVacios[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
+        }
+
+        semname = "llenos";
+        sem_t **arraySemLlenos = new sem_t *[i_rec];
+        for (int j = 0; j < i_rec; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemLlenos[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
+        }
+
+        semname = "mutex";
+        sem_t **arraySemMutex = new sem_t *[i_rec];
+        for (int j = 0; j < i_rec; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemMutex[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
         }
 
     } else {

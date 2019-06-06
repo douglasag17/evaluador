@@ -27,8 +27,22 @@ int Stop::getArguments(char *argv[]) {
         struct Header *pHeader = (struct Header *) dir;
         int i_rec = pHeader -> i;
 
-        string semname = "semaforo";
-        for (int j = 0; j < i_rec*3; j++) {
+        string semname = "vacios";
+        for (int j = 0; j < i_rec; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            sem_unlink(&realName[0u]);
+        }
+        semname = "llenos";
+        for (int j = 0; j < i_rec; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            sem_unlink(&realName[0u]);
+        }
+        semname = "mutex";
+        for (int j = 0; j < i_rec; j++) {
             ostringstream name;
             name << semname << j;
             string realName(name.str());
