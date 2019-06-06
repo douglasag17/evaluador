@@ -89,6 +89,19 @@ int Init::getArguments(int argc, char *argv[]) {
         pHeader -> s = s_rec;
 
         close(fd);
+
+        string semname = "semaforo";
+        sem_t **arraySem = new sem_t *[i_rec*3];
+        for (int j = 0; j < i_rec*3; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySem[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
+            if (arraySem[j] == SEM_FAILED) {
+                cerr << "Error " << endl;
+            }
+        }
+
     } else {
         cout << "Invalid number of arguments." << endl;
     }

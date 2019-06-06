@@ -22,7 +22,7 @@ $(SRCDIR)/stop.o: stop.cpp stop.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 $(BINDIR)/evaluator: evaluator.o init.o reg.o ctrl.o rep.o stop.o
-	$(CXX) -o $@ $(LDFLAGS) $^ -lrt
+	$(CXX) -o $@ $^ -lrt $(LDFLAGS)
 	
 $(SRCDIR)/evaluator.o: evaluator.cpp init.h reg.h ctrl.h rep.h stop.h
 	$(CXX) $(CXXFLAGS) -o $@ -c $<
