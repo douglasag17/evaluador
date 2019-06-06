@@ -1,4 +1,5 @@
 #pragma once
+#include "struct.h"
 #include <stdio.h>
 #include <string>
 #include <iostream>
@@ -11,7 +12,10 @@
 #include <cstring>
 #include <unistd.h>
 #include <sys/types.h>
-#include "struct.h"
+#include <sys/stat.h>
+#include <sstream>
+#include <cstdlib>
+
 
 class Reg {
     public: 

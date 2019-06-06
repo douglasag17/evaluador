@@ -96,7 +96,7 @@ int Init::getArguments(int argc, char *argv[]) {
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySemVacios[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
+            arraySemVacios[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
         }
 
         semname = "llenos";
@@ -105,7 +105,7 @@ int Init::getArguments(int argc, char *argv[]) {
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySemLlenos[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
+            arraySemLlenos[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 0);
         }
 
         semname = "mutex";

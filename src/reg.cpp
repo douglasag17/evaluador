@@ -154,21 +154,56 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
             exit(1);
         }
 
-        //Code to create and initialize queues
+        // opening semaphores
+        string semname = "vacios";
+        sem_t **arraySemVacios = new sem_t *[i_rec];
+        for (int j = 0; j < i_rec; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemVacios[j] = sem_open(realName.c_str(), 0);
+        }
+        semname = "llenos";
+        sem_t **arraySemLlenos = new sem_t *[i_rec];
+        for (int j = 0; j < i_rec; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemLlenos[j] = sem_open(realName.c_str(), 0);
+        }
+        semname = "mutex";
+        sem_t **arraySemMutex = new sem_t *[i_rec];
+        for (int j = 0; j < i_rec; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemMutex[j] = sem_open(realName.c_str(), 0);
+        }
+
+        //Code to create
         Exam *colas[i_rec];
         colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
         for(int i = 1; i < i_rec; i++){
             colas[i] = (struct Exam*) ((char *) dir) + sizeof(colas[i-1]) + (sizeof(struct Exam) * ie_rec);
         }
+
+        sem_wait(arraySemVacios[inbox]);
+        sem_wait(arraySemMutex[inbox]);
+
+        // initialize queues
         colas[inbox]->id = id;
         colas[inbox]->i = inbox;
         colas[inbox]->k = sample[0u];
         colas[inbox]->q = amount_sample;
+        
         int id = Reg::id;
         if (isFile) { 
             ids_file += to_string(id) + "\n";
         } else cout << id << endl;
         cout << colas[inbox]->i << colas[inbox]->id << colas[inbox]->k << colas[inbox]->q << endl;
         Reg::id++;
-    }
+
+        sem_post(arraySemMutex[inbox]);
+        sem_post(arraySemLlenos[inbox]);
+    }    
 }
