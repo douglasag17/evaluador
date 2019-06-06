@@ -130,8 +130,6 @@ int Reg::getArguments(int argc, char *argv[])  {
     return 0;
 }
 
-//void Reg::
-
 void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int amount_sample){
     int id = Reg::id;
     if (isFile) { 
@@ -144,36 +142,40 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
     }
 
     void *dir;
-    if ((dir = mmap(NULL, sizeof(struct exam), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+    if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
         cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
         exit(1);
     }
 
     //Code to create and initialize queues
-    struct exam *pExam = (struct exam *) dir;
-    int i_rec = pExam -> i_rec;
-    queues *colas[i_rec + 1];
-    for (int i = 0; i < i_rec+1; ++i) {
-        if (i == i_rec) {
-            colas[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * (i_rec -1)));
-            colas[i]->size = pExam -> oe;
-        } else {
-            colas[i] = (struct queues*) ((char*) dir  + (sizeof(struct queues)));
-            colas[i]->size = pExam -> ie;
-        }
+    struct Header *pHeader = (struct Header *) dir;
+    int i_rec = pHeader -> i;
+    Exam **bandejas = new Exam *[pHeader->i * pHeader->ie];
+    bandejas[0] = (struct Exam*) ((char *) pHeader) + sizeof(pHeader);
+    for(int i = 1; i < i_rec; i++){
+        bandejas[i] = (struct Exam*) (bandejas[i-1]) + (sizeof(bandejas) * pHeader->ie);
     }
-    exam examen;
+
+    Exam examen;
     examen.id = id;
     examen.i = inbox;
     examen.k = sample[0u];
     examen.q = amount_sample;
-    //node *tmp = x.front();
-    colas[inbox]->cola.push(examen);
+    bandejas[inbox] = &examen;
 
-    /*for(int i = 0; i < colas[inbox]->cola.size();++i){
-        cout << colas[inbox]->cola.front().id << colas[inbox]->cola.front().k << endl;
-        colas[inbox]->cola.pop();
-    }*/
+    cout << bandejas[inbox]->i << bandejas[inbox]->id << bandejas[inbox]->k << bandejas[inbox]->q << endl;
 
     Reg::id++;
 }
+
+
+/*queues *colas[i_rec + 1];
+for (int i = 0; i < i_rec+1; ++i) {
+    if (i == i_rec) {
+        colas[i] = (struct queues*) ((char*) dir + (sizeof(struct queues) * (i_rec -1)));
+        colas[i]->size = pExam -> oe;
+    } else {
+        colas[i] = (struct queues*) ((char*) dir  + (sizeof(struct queues)));
+        colas[i]->size = pExam -> ie;
+    }
+}*/

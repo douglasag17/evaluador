@@ -1,6 +1,5 @@
 #include "init.h"
 #include "struct.h"
-#include <queue>
 
 using namespace std;
 
@@ -15,7 +14,7 @@ int Init::getArguments(int argc, char *argv[]) {
             string opt = argv[i];
             if(opt.compare("-i") == 0) {
                 if(argv[i+1][0] != '-') {
-                    i_rec = stoi(argv[i+1]);
+                    i_rec = atoi(argv[i+1]);
                 } else {
                     i_rec = 5;
                 }
@@ -69,23 +68,25 @@ int Init::getArguments(int argc, char *argv[]) {
             cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
-        if (ftruncate(fd, (sizeof(struct queues) * i_rec * ie_rec) + sizeof(struct queues) * oe_rec + sizeof(struct exam) != 0)) {
+        if (ftruncate(fd, (sizeof(struct Exam) * i_rec * ie_rec) + sizeof(struct Exam) * oe_rec + sizeof(struct Header) != 0)) {
             cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
+
         void *dir;
-        if ((dir = mmap(NULL, sizeof(struct queues), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+        if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
             cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
 
-        struct exam *pExam = (struct exam *) dir;
-        pExam -> b = b_rec;
-        pExam -> d = d_rec;
-        pExam -> s = s_rec;
-        pExam -> ie = ie_rec;
-        pExam -> oe = oe_rec;
-        pExam -> i_rec = i_rec;
+        struct Header *pHeader = (struct Header *) dir;
+        pHeader -> i = i_rec;
+        pHeader -> ie = ie_rec;
+        pHeader -> oe = oe_rec;
+        pHeader -> q = q_rec;
+        pHeader -> b = b_rec;
+        pHeader -> d = d_rec;
+        pHeader -> s = s_rec;
 
         close(fd);
     } else {
