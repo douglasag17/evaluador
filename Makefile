@@ -1,6 +1,6 @@
 SRCDIR   := src
 BINDIR   := bin
-LDFLAGS  := -pthread	
+LDFLAGS  := -lpthread
 CXXFLAGS := -Wall -Wextra -std=c++11 -I include
 all: dirs $(BINDIR)/evaluator
 
