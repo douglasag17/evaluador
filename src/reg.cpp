@@ -11,7 +11,6 @@ int *num_exams;
 int Reg::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
     if (flag.compare("-n") == 0) {
-        // ¿hay que comparar nameShareMem con -n del init?
         string nameShareMem;
         string reg;
         if(argc == 4){
@@ -27,20 +26,19 @@ int Reg::getArguments(int argc, char *argv[])  {
                 cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
                 exit(1);
             }
-
             void *dir;
             if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
                 cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
                 exit(1);
             }
-
             struct Header *pHeader = (struct Header *) dir;
             int i_rec = pHeader -> i;
             int oe_rec = pHeader ->oe;
             int ie_rec = pHeader -> ie;
             munmap(dir, sizeof(struct Header));
             dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-            //Code to create
+            
+            //Code to create queues
             Reg::colas = new Exam*[i_rec+1];
             colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
             for(int i = 1; i < i_rec + 1; i++){
@@ -48,6 +46,7 @@ int Reg::getArguments(int argc, char *argv[])  {
             }
             num_exams = new int[i_rec];
             for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
+            
             // interactive mode
             string registers;
             cout << "> ";
@@ -66,7 +65,6 @@ int Reg::getArguments(int argc, char *argv[])  {
                 }
                 sample = arr[0];
                 amount_sample = atoi(arr[1]);
-                // verificar inbox menor que i-1 y que el tipo de muestra sea B D S
                 if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                     cout << "invalid parameters" << endl;
                 }else{
@@ -78,8 +76,36 @@ int Reg::getArguments(int argc, char *argv[])  {
             // reading file
             if (nameShareMem.find(".") != string::npos || nameShareMem.compare("evaluator") == 0){
                 nameShareMem = "evaluator";
+                int fd = shm_open(nameShareMem.c_str(), O_RDWR, 0660);
+                if (fd < 0) {
+                    cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
+                    exit(1);
+                }
+                void *dir;
+                if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+                    cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
+                    exit(1);
+                }
+                struct Header *pHeader = (struct Header *) dir;
+                int i_rec = pHeader -> i;
+                int oe_rec = pHeader ->oe;
+                int ie_rec = pHeader -> ie;
+                munmap(dir, sizeof(struct Header));
+                dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+                
+                //Code to create queues
+                Reg::colas = new Exam*[i_rec+1];
+                colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
+                for(int i = 1; i < i_rec + 1; i++){
+                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                }
+                num_exams = new int[i_rec];
+                for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
+
+                // read file
                 for(int i = 3; i < argc; ++i){
                     string line;
+                    ids_file = "";
                     ifstream myfile (argv[i]);
                     if (myfile.is_open()) {
                         while (getline (myfile, line)) {
@@ -97,11 +123,10 @@ int Reg::getArguments(int argc, char *argv[])  {
                             }
                             sample = arr[0];
                             amount_sample = atoi(arr[1]);
-                            // verificar inbox menor que i-1 y que el tipo de muestra sea B D S
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                //openMem(true ,nameShareMem, inbox, sample, amount_sample);
+                                openMem(true ,nameShareMem, inbox, sample, amount_sample, i_rec, ie_rec);
                             }
                         }
                         ofstream outFile;
@@ -115,7 +140,35 @@ int Reg::getArguments(int argc, char *argv[])  {
                 }   
             }else{
                 for(int i = 4; i < argc; ++i){
+                    int fd = shm_open(nameShareMem.c_str(), O_RDWR, 0660);
+                    if (fd < 0) {
+                        cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
+                        exit(1);
+                    }
+                    void *dir;
+                    if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+                        cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
+                        exit(1);
+                    }
+                    struct Header *pHeader = (struct Header *) dir;
+                    int i_rec = pHeader -> i;
+                    int oe_rec = pHeader ->oe;
+                    int ie_rec = pHeader -> ie;
+                    munmap(dir, sizeof(struct Header));
+                    dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+                    
+                    //Code to create queues
+                    Reg::colas = new Exam*[i_rec+1];
+                    colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
+                    for(int i = 1; i < i_rec + 1; i++){
+                        colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                    }
+                    num_exams = new int[i_rec];
+                    for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
+
+                    // read file
                     string line;
+                    ids_file = "";
                     ifstream myfile (argv[i]);
                     if (myfile.is_open()) {
                         while ( getline (myfile,line)) {
@@ -133,11 +186,10 @@ int Reg::getArguments(int argc, char *argv[])  {
                             }
                             sample = arr[0];
                             amount_sample = atoi(arr[1]);
-                            // verificar inbox menor que i-1 y que el tipo de muestra sea B D S
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                //openMem(true, nameShareMem, inbox, sample, amount_sample);
+                                openMem(true, nameShareMem, inbox, sample, amount_sample, i_rec, ie_rec);
                             }
                         }
                         ofstream outFile;
@@ -189,7 +241,7 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
         sem_wait(arraySemMutex[inbox]);
 
         Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam) * num_exams[inbox];
-        cout << num_exams[inbox] << endl;
+
         // initialize queues
         copy->id = id;
         copy->i = inbox;
