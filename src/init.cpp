@@ -5,6 +5,18 @@ using namespace std;
 
 Init::Init(){}
 Init::~Init(){}
+void* routineThread(void *inbox);
+Exam **colas;
+queue <struct Exam> queueBlood;
+queue <struct Exam> queueSkin;
+queue <struct Exam> queueDetritos;
+
+struct argHilo {
+    sem_t* vacios;
+    sem_t* lleno;
+    sem_t* mutex;
+    Exam *cola;
+};
 
 int Init::getArguments(int argc, char *argv[]) {
     int i_rec, ie_rec, oe_rec, b_rec, d_rec, s_rec, q_rec;
@@ -88,8 +100,6 @@ int Init::getArguments(int argc, char *argv[]) {
         pHeader -> d = d_rec;
         pHeader -> s = s_rec;
 
-        close(fd);
-
         string semname = "vacios";
         sem_t **arraySemVacios = new sem_t *[i_rec];
         for (int j = 0; j < i_rec; j++) {
@@ -116,10 +126,59 @@ int Init::getArguments(int argc, char *argv[]) {
             string realName(name.str());
             arraySemMutex[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
         }
+        munmap(dir, sizeof(struct Header));
+        dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        colas = new Exam*[i_rec];
+        colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
+        for(int i = 1; i < i_rec; i++){
+            colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+        }
+        /*sleep(15);
+        int i = 0;
+        while(i < ie_rec){
+            Exam *copy = (struct Exam*)((char*)colas[0]) + sizeof(struct Exam)*i;
+            cout << i << ": "<< copy->id << endl;
+            i++;
+            sleep(2);
+        }*/
+        
+        pthread_t hilosEntrada[i_rec];
+        for(int i = 0; i < i_rec; i++){
+            struct argHilo *arg = new argHilo;
+            arg -> vacios = arraySemVacios[i];
+            arg -> lleno = arraySemLlenos[i];
+            arg -> mutex = arraySemMutex[i];
+            arg -> cola = colas[i];
+            pthread_create(&hilosEntrada[i], NULL, routineThread, arg);
+            pthread_join(hilosEntrada[i_rec], NULL);
+        }
+        //sem_wait(arraySemLlenos[]);
+        //sem_wait(arraySemMutex[]);
 
+
+        //sem_post(arraySemMutex[]);
+        //sem_post(arraySemVacios[]);
+        close(fd);
     } else {
         cout << "Invalid number of arguments." << endl;
     }
-    for(;;);
     return 0;
+}
+
+void* routineThread(void *inbox){
+    struct argHilo *arg = (argHilo*) inbox;
+    do {
+        // verificar si hay algo en la cola
+        
+        //sem_wait(arg -> lleno);
+        //sem_wait(arg -> mutex);
+        
+        Exam *copy = (struct Exam*) arg -> cola;
+        cout << copy -> i << " " <<copy->id << endl;
+
+        //sem_post(arg -> mutex);
+        //sem_post(arg -> vacios);
+
+    } while (true);
+    
 }

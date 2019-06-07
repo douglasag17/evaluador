@@ -15,6 +15,8 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <queue>
+#include "struct.h"
 
 class Init {
     public: 
