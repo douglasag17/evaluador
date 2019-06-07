@@ -150,7 +150,7 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> mutex = arraySemMutex[i];
             arg -> cola = colas[i];
             pthread_create(&hilosEntrada[i], NULL, routineThread, arg);
-            pthread_join(hilosEntrada[i_rec], NULL);
+            //pthread_join(hilosEntrada[i_rec], NULL);
         }
         //sem_wait(arraySemLlenos[]);
         //sem_wait(arraySemMutex[]);
@@ -162,6 +162,7 @@ int Init::getArguments(int argc, char *argv[]) {
     } else {
         cout << "Invalid number of arguments." << endl;
     }
+    for(;;);
     return 0;
 }
 
@@ -169,15 +170,14 @@ void* routineThread(void *inbox){
     struct argHilo *arg = (argHilo*) inbox;
     do {
         // verificar si hay algo en la cola
-        
-        //sem_wait(arg -> lleno);
-        //sem_wait(arg -> mutex);
-        
+        sem_wait(arg -> lleno);
+        sem_wait(arg -> mutex);
+    
         Exam *copy = (struct Exam*) arg -> cola;
-        cout << copy -> i << " " <<copy->id << endl;
+        cout << copy -> id << " " << copy->i << " " << copy->k << copy->q <<endl;
 
-        //sem_post(arg -> mutex);
-        //sem_post(arg -> vacios);
+        sem_post(arg -> mutex);
+        sem_post(arg -> vacios);
 
     } while (true);
     
