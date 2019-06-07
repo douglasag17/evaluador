@@ -6,6 +6,7 @@ Reg::Reg(){}
 Reg::~Reg(){}
 
 string ids_file = "";
+int *num_exams;
 
 int Reg::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
@@ -21,6 +22,32 @@ int Reg::getArguments(int argc, char *argv[])  {
             reg = argv[4];
         }
         if (reg.compare("-") == 0) {
+            int fd = shm_open(nameShareMem.c_str(), O_RDWR, 0660);
+            if (fd < 0) {
+                cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
+                exit(1);
+            }
+
+            void *dir;
+            if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+                cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
+                exit(1);
+            }
+
+            struct Header *pHeader = (struct Header *) dir;
+            int i_rec = pHeader -> i;
+            int oe_rec = pHeader ->oe;
+            int ie_rec = pHeader -> ie;
+            munmap(dir, sizeof(struct Header));
+            dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+            //Code to create
+            Reg::colas = new Exam*[i_rec+1];
+            colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
+            for(int i = 1; i < i_rec + 1; i++){
+                colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+            }
+            num_exams = new int[i_rec];
+            for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
             // interactive mode
             string registers;
             cout << "> ";
@@ -43,7 +70,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                 if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                     cout << "invalid parameters" << endl;
                 }else{
-                    openMem(false, nameShareMem,inbox, sample, amount_sample);
+                    openMem(false, nameShareMem,inbox, sample, amount_sample, i_rec, ie_rec);
                 }
                 cout << "> ";
             }
@@ -74,7 +101,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                openMem(true ,nameShareMem, inbox, sample, amount_sample);
+                                //openMem(true ,nameShareMem, inbox, sample, amount_sample);
                             }
                         }
                         ofstream outFile;
@@ -110,7 +137,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                openMem(true, nameShareMem, inbox, sample, amount_sample);
+                                //openMem(true, nameShareMem, inbox, sample, amount_sample);
                             }
                         }
                         ofstream outFile;
@@ -130,30 +157,8 @@ int Reg::getArguments(int argc, char *argv[])  {
     return 0;
 }
 
-void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int amount_sample){
-    int fd = shm_open(nameShareMem.c_str(), O_RDWR, 0660);
-    if (fd < 0) {
-        cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
-        exit(1);
-    }
-
-    void *dir;
-    if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
-        cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
-        exit(1);
-    }
-
-    struct Header *pHeader = (struct Header *) dir;
-    int i_rec = pHeader -> i;
-    int oe_rec = pHeader ->oe;
-    int ie_rec = pHeader -> ie;
-    munmap(dir, sizeof(struct Header));
+void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int amount_sample, int i_rec, int ie_rec){
     if(inbox < i_rec){
-        if ((dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
-            cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
-            exit(1);
-        }
-
         // opening semaphores
         string semname = "vacios";
         sem_t **arraySemVacios = new sem_t *[i_rec];
@@ -180,27 +185,24 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
             arraySemMutex[j] = sem_open(realName.c_str(), 0);
         }
 
-        //Code to create
-        Exam *colas[i_rec];
-        colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
-        for(int i = 1; i < i_rec; i++){
-            colas[i] = (struct Exam*) ((char *) dir) + sizeof(colas[i-1]) + (sizeof(struct Exam) * ie_rec);
-        }
-
         sem_wait(arraySemVacios[inbox]);
         sem_wait(arraySemMutex[inbox]);
 
+        Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam) * num_exams[inbox];
+        cout << num_exams[inbox] << endl;
         // initialize queues
-        colas[inbox]->id = id;
-        colas[inbox]->i = inbox;
-        colas[inbox]->k = sample[0u];
-        colas[inbox]->q = amount_sample;
+        copy->id = id;
+        copy->i = inbox;
+        copy->k = sample[0u];
+        copy->q = amount_sample;
+        if(num_exams[inbox] < ie_rec) num_exams[inbox]+=1;
+        else num_exams[inbox] = 0;
         
         int id = Reg::id;
         if (isFile) { 
             ids_file += to_string(id) + "\n";
         } else cout << id << endl;
-        cout << colas[inbox]->i << colas[inbox]->id << colas[inbox]->k << colas[inbox]->q << endl;
+        //cout << colas[inbox]->i << colas[inbox]->id << colas[inbox]->k << colas[inbox]->q << endl;
         Reg::id++;
 
         sem_post(arraySemMutex[inbox]);

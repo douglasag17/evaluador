@@ -23,6 +23,7 @@ class Reg {
     ~Reg();
     int id = 0;
     int getArguments(int argc, char *argv[]);
+    Exam **colas;
     void openMem(bool isFile, string nameShareMem, int inbox, char *sample,
-        int amount_sample);
+        int amount_sample, int i_rec, int ie_rec);
 };
