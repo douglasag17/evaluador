@@ -24,9 +24,9 @@ struct argHilo {
 };
 
 struct argInternos {
-    sem_t* vacios;
-    sem_t* lleno;
-    sem_t* mutex;
+    sem_t* vaciosInternos;
+    sem_t* llenoInternos;
+    sem_t* mutexInternos;
     int typeQueue;
 };
 
@@ -151,7 +151,7 @@ int Init::getArguments(int argc, char *argv[]) {
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySemLlenosInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
+            arraySemLlenosInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 0);
         }
         semname = "mutexInterno";
         sem_t **arraySemMutexInterno = new sem_t *[i_rec];
@@ -159,7 +159,7 @@ int Init::getArguments(int argc, char *argv[]) {
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySemMutexInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
+            arraySemMutexInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
         }
 
         munmap(dir, sizeof(struct Header));
@@ -190,9 +190,9 @@ int Init::getArguments(int argc, char *argv[]) {
         pthread_t hilosInternos[3];
         for(int i = 0; i < 3; i++){
             struct argInternos *arg = new argInternos;
-            arg -> vacios = arraySemVaciosInterno[i];
-            arg -> lleno = arraySemLlenosInterno[i];
-            arg -> mutex = arraySemMutexInterno[i];
+            arg -> vaciosInternos = arraySemVaciosInterno[i];
+            arg -> llenoInternos = arraySemLlenosInterno[i];
+            arg -> mutexInternos = arraySemMutexInterno[i];
             arg -> typeQueue = i;
             pthread_create(&hilosInternos[i], NULL, routineInternos, arg);
         }
@@ -258,5 +258,4 @@ void* routineInternos(void *inbox) {
     do {
         
     } while (true);
-    
 }

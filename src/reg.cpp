@@ -217,7 +217,7 @@ void Reg::openMem(bool isFile, int inbox, char *sample, int amount_sample, int i
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySemVacios[j] = sem_open(realName.c_str(), 0);
+            arraySemVacios[j] = sem_open(realName.c_str(), ie_rec);
         }
         semname = "llenos";
         sem_t **arraySemLlenos = new sem_t *[i_rec];
@@ -233,7 +233,7 @@ void Reg::openMem(bool isFile, int inbox, char *sample, int amount_sample, int i
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySemMutex[j] = sem_open(realName.c_str(), 0);
+            arraySemMutex[j] = sem_open(realName.c_str(), 1);
         }
 
         sem_wait(arraySemVacios[inbox]);
