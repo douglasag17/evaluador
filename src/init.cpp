@@ -13,7 +13,9 @@ int ie_rec = 0;
 queue <struct Exam> queueBlood;
 queue <struct Exam> queueSkin;
 queue <struct Exam> queueDetritos;
-
+sem_t *arraySemVaciosInterno[3];
+sem_t *arraySemLlenosInterno[3];
+sem_t *arraySemMutexInterno[3];
 struct argHilo {
     sem_t* vacios;
     sem_t* lleno;
@@ -138,15 +140,13 @@ int Init::getArguments(int argc, char *argv[]) {
             arraySemMutex[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
         }
         semname = "vaciosInterno";
-        sem_t **arraySemVaciosInterno = new sem_t *[i_rec];
         for (int j = 0; j < 3; j++) {
             ostringstream name;
             name << semname << j;
             string realName(name.str());
-            arraySemVaciosInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
+            arraySemVaciosInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, q_rec);
         }
         semname = "llenosInterno";
-        sem_t **arraySemLlenosInterno = new sem_t *[i_rec];
         for (int j = 0; j < 3; j++) {
             ostringstream name;
             name << semname << j;
@@ -154,7 +154,6 @@ int Init::getArguments(int argc, char *argv[]) {
             arraySemLlenosInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 0);
         }
         semname = "mutexInterno";
-        sem_t **arraySemMutexInterno = new sem_t *[i_rec];
         for (int j = 0; j < 3; j++) {
             ostringstream name;
             name << semname << j;
@@ -164,6 +163,8 @@ int Init::getArguments(int argc, char *argv[]) {
 
         munmap(dir, sizeof(struct Header));
         dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        
+        //Code to create queues
         colas = new Exam*[i_rec + 1];
         colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
         for(int i = 1; i < i_rec + 1; i++){
@@ -212,15 +213,19 @@ void* routineThread(void *inbox){
     struct argHilo *arg = (argHilo*) inbox;
     do {
         struct Exam examen;
-        // verificar si hay algo en la cola
+
         sem_wait(arg -> lleno);
         sem_wait(arg -> mutex);
+
         Exam *copy = (struct Exam*) arg -> cola + (sizeof(struct Exam) * num_exams1[arg->indice]);
         examen.id = copy->id;
         examen.i = copy->i;
         examen.k = copy->k;
         examen.q = copy->q;
         if(copy->k == 'S'){
+            sem_wait(arraySemVaciosInterno[0]);
+            sem_wait(arraySemMutexInterno[0]);
+            
             while(queueSkin.size() >= arg->q_rec) {
                 //Cola llena
             }
@@ -228,7 +233,13 @@ void* routineThread(void *inbox){
             queueSkin.push(examen);
             copy -> q = 0;
             cout << "Skin" << endl;
+
+            sem_post(arraySemMutexInterno[0]);
+            sem_post(arraySemLlenosInterno[0]);
         }else if(copy->k == 'B'){
+            sem_wait(arraySemVaciosInterno[1]);
+            sem_wait(arraySemMutexInterno[1]);
+
             while(queueBlood.size() >= arg->q_rec) {
                 //Cola llena
             }
@@ -236,7 +247,13 @@ void* routineThread(void *inbox){
             queueBlood.push(examen);
             copy -> q = 0;
             cout << "Blood" << endl;
+
+            sem_post(arraySemMutexInterno[1]);
+            sem_post(arraySemLlenosInterno[1]);
         }else if(copy->k == 'D'){
+            sem_wait(arraySemVaciosInterno[2]);
+            sem_wait(arraySemMutexInterno[2]);
+            
             while(queueDetritos.size() >= arg->q_rec) {
                 //Cola llena
             }
@@ -244,9 +261,13 @@ void* routineThread(void *inbox){
             queueDetritos.push(examen);
             copy -> q = 0;
             cout << "Detritos" << endl;
+
+            sem_post(arraySemMutexInterno[2]);
+            sem_post(arraySemLlenosInterno[2]);
         }
         if(num_exams1[arg->indice] < ie_rec-1) num_exams1[arg->indice]+=1;
         else num_exams1[arg->indice] = 0;
+
         sem_post(arg -> mutex);
         sem_post(arg -> vacios);
     } while (true);
