@@ -9,7 +9,7 @@ void* routineThread(void *inbox);
 void* routineInternos(void *inbox);
 Exam **colas;
 int *num_exams1;
-int ie_rec = 0;
+int numExamSalida = 0;
 queue <struct Exam> queueBlood;
 queue <struct Exam> queueSkin;
 queue <struct Exam> queueDetritos;
@@ -23,6 +23,7 @@ struct argHilo {
     Exam *cola;
     int indice;
     int q_rec;
+    int ie_rec = 0;
 };
 
 struct argInternos {
@@ -32,11 +33,12 @@ struct argInternos {
     int typeQueue;
     void *dirHeader;
     Exam *cola;
+    int oe_rec = 0;
 };
 void *dirHeader;
 
 int Init::getArguments(int argc, char *argv[]) {
-    int i_rec, oe_rec, b_rec, d_rec, s_rec, q_rec;
+    int i_rec, ie_rec, oe_rec, b_rec, d_rec, s_rec, q_rec;
     string n_rec;
     if(argc >= 10) {
         for(int i = 1; i < argc; ++i) {
@@ -186,6 +188,7 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> cola = colas[i];
             arg -> indice = i;
             arg -> q_rec = q_rec;
+            arg -> ie_rec = ie_rec;
             pthread_create(&hilosEntrada[i], NULL, routineThread, arg);
         }  
 
@@ -197,7 +200,8 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> mutexInternos = arraySemMutexInterno[i];
             arg -> typeQueue = i;
             arg -> dirHeader = dirHeader;
-            arg -> cola = colas[i_rec+1];
+            arg -> cola = colas[i_rec];
+            arg -> oe_rec = oe_rec;
             pthread_create(&hilosInternos[i], NULL, routineInternos, arg);
         }
 
@@ -272,7 +276,7 @@ void* routineThread(void *inbox){
             sem_post(arraySemMutexInterno[2]);
             sem_post(arraySemLlenosInterno[2]);
         }
-        if(num_exams1[arg->indice] < ie_rec-1) num_exams1[arg->indice]+=1;
+        if(num_exams1[arg->indice] < arg -> ie_rec-1) num_exams1[arg->indice]+=1;
         else num_exams1[arg->indice] = 0;
 
         sem_post(arg -> mutex);
@@ -288,20 +292,18 @@ void* routineInternos(void *inbox) {
         struct Exam examen;
         sem_wait(arg -> llenoInternos);
         sem_wait(arg -> mutexInternos);
-
-        Exam *copy = (struct Exam*) arg -> cola + (sizeof(struct Exam) * num_exams1[arg->typeQueue]);
+        Exam *copy = (struct Exam*) arg -> cola + (sizeof(struct Exam) * numExamSalida);
+        cout << "Dir cola salida: "<< copy << " numExams: " << numExamSalida << endl; 
         if (arg->typeQueue == 0) {
             // Skin
             examen = queueSkin.front();
             queueSkin.pop();
-
             // Procesar Muestra
             srand(time(NULL));
             for (int i = 0; i < examen.q; i++) {
                 int randomSample = rand() % (25-8 +1) + 8;
                 pHeader -> s -= randomSample;
             }
-            
             // Obtencion resultado
             int randomResult = rand() % (50-0 +1) + 0;
             if (randomResult <= 15) {
@@ -311,18 +313,79 @@ void* routineInternos(void *inbox) {
             } else if (randomResult > 35 && randomResult <= 50) {
                 examen.r = 'P';
             }
-            
             // Tiempo de procesamiento
             int randomTime = rand() % 10;
+            examen.p = randomTime;
+            // Agregar a la cola de salida
+            copy -> id = examen.id;
+            copy -> i = examen.i;
+            copy -> k = examen.k;
+            copy -> q = examen.q;
+            copy -> r = examen.r;
+            copy -> p = examen.p;
 
-            
         } else if (arg->typeQueue == 1) {
             // Blood
+            examen = queueBlood.front();
+            queueBlood.pop();
+            // Procesar Muestra
+            srand(time(NULL));
+            for (int i = 0; i < examen.q; i++) {
+                int randomSample = rand() % (7-1 +1) + 1;
+                pHeader -> b -= randomSample;
+            }
+            // Obtencion resultado
+            int randomResult = rand() % (50-0 +1) + 0;
+            if (randomResult <= 15) {
+                examen.r = '?';
+            } else if (randomResult > 15 && randomResult <= 35) {
+                examen.r = 'N';
+            } else if (randomResult > 35 && randomResult <= 50) {
+                examen.r = 'P';
+            }
+            // Tiempo de procesamiento
+            int randomTime = rand() % 10;
+            examen.p = randomTime;
+            // Agregar a la cola de salida
+            copy -> id = examen.id;
+            copy -> i = examen.i;
+            copy -> k = examen.k;
+            copy -> q = examen.q;
+            copy -> r = examen.r;
+            copy -> p = examen.p;
             
         } else if (arg->typeQueue == 2) {
             // Detritos
-            
-        } 
+            examen = queueDetritos.front();
+            queueDetritos.pop();
+            // Procesar Muestra
+            srand(time(NULL));
+            for (int i = 0; i < examen.q; i++) {
+                int randomSample = rand() % (20-5 +1) + 5;
+                pHeader -> d -= randomSample;
+            }
+            // Obtencion resultado
+            int randomResult = rand() % (50-0 +1) + 0;
+            if (randomResult <= 15) {
+                examen.r = '?';
+            } else if (randomResult > 15 && randomResult <= 35) {
+                examen.r = 'N';
+            } else if (randomResult > 35 && randomResult <= 50) {
+                examen.r = 'P';
+            }
+            // Tiempo de procesamiento
+            int randomTime = rand() % 10;
+            examen.p = randomTime;
+            // Agregar a la cola de salida
+            copy -> id = examen.id;
+            copy -> i = examen.i;
+            copy -> k = examen.k;
+            copy -> q = examen.q;
+            copy -> r = examen.r;
+            copy -> p = examen.p;
+        }
+        if(numExamSalida < arg -> oe_rec - 1) numExamSalida += 1;
+        else numExamSalida = 0;
         
         sem_post(arg -> mutexInternos);
         sem_post(arg -> vaciosInternos);
