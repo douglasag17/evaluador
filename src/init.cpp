@@ -169,13 +169,26 @@ int Init::getArguments(int argc, char *argv[]) {
 void* routineThread(void *inbox){
     struct argHilo *arg = (argHilo*) inbox;
     do {
+        struct Exam examen;
         // verificar si hay algo en la cola
         sem_wait(arg -> lleno);
         sem_wait(arg -> mutex);
-    
         Exam *copy = (struct Exam*) arg -> cola;
-        cout << copy -> id << " " << copy->i << " " << copy->k << copy->q <<endl;
-
+        //cout << copy -> id << " " << copy->i << " " << copy->k << copy->q <<endl;
+        examen.id = copy->id;
+        examen.i = copy->i;
+        examen.k = copy->k;
+        examen.q = copy->q;
+        if(copy->k == 'S'){
+            queueSkin.push(examen);
+            cout << "Skin" << endl;
+        }else if(copy->k == 'B'){
+            queueBlood.push(examen);
+            cout << "Blood" << endl;
+        }else if(copy->k == 'D'){
+            queueDetritos.push(examen);
+            cout << "Detritos" << endl;
+        }
         sem_post(arg -> mutex);
         sem_post(arg -> vacios);
 
