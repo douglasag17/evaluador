@@ -40,9 +40,12 @@ int Reg::getArguments(int argc, char *argv[])  {
             
             //Code to create queues
             Reg::colas = new Exam*[i_rec+1];
-            colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
-            for(int i = 1; i < i_rec + 1; i++){
-                colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+            for(int i = 0; i < i_rec + 1; i++){
+                if(i == i_rec){
+                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
+                }else{
+                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                }
             }
             num_exams = new int[i_rec];
             for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
@@ -94,9 +97,12 @@ int Reg::getArguments(int argc, char *argv[])  {
                 
                 //Code to create queues
                 Reg::colas = new Exam*[i_rec+1];
-                colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
-                for(int i = 1; i < i_rec + 1; i++){
-                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                for(int i = 0; i < i_rec + 1; i++){
+                    if(i == i_rec){
+                        colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
+                    }else{
+                        colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                    }
                 }
                 num_exams = new int[i_rec];
                 for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
@@ -158,9 +164,12 @@ int Reg::getArguments(int argc, char *argv[])  {
                     
                     //Code to create queues
                     Reg::colas = new Exam*[i_rec+1];
-                    colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
-                    for(int i = 1; i < i_rec + 1; i++){
-                        colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                    for(int i = 0; i < i_rec + 1; i++){
+                        if(i == i_rec){
+                            colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
+                        }else{
+                            colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                        }
                     }
                     num_exams = new int[i_rec];
                     for(int i = 0; i < i_rec; i++) num_exams[i] = 0;

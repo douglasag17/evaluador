@@ -99,7 +99,7 @@ int Init::getArguments(int argc, char *argv[]) {
             cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
-        if (ftruncate(fd, (sizeof(struct Exam) * i_rec * ie_rec) + sizeof(struct Exam) * oe_rec + sizeof(struct Header) != 0)) {
+        if (ftruncate(fd, sizeof(struct Header) + (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) != 0)) {
             cerr << "Error creando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
@@ -168,13 +168,16 @@ int Init::getArguments(int argc, char *argv[]) {
         }
 
         munmap(dir, sizeof(struct Header));
-        dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        
+        dir = mmap(NULL, sizeof(struct Header) + (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         //Code to create queues
         colas = new Exam*[i_rec + 1];
-        colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
-        for(int i = 1; i < i_rec + 1; i++){
-            colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+        for(int i = 0; i < i_rec + 1; i++){
+            if(i == i_rec){
+                colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
+            }else{
+                colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+            }
+            cout << "Dir cola test: " << colas[i] << endl;
         }
         num_exams1 = new int[i_rec];
         for(int i = 0; i < i_rec; i++) num_exams1[i] = 0;
