@@ -30,7 +30,10 @@ struct argInternos {
     sem_t* llenoInternos;
     sem_t* mutexInternos;
     int typeQueue;
+    void *dirHeader;
+    Exam *cola;
 };
+void *dirHeader;
 
 int Init::getArguments(int argc, char *argv[]) {
     int i_rec, oe_rec, b_rec, d_rec, s_rec, q_rec;
@@ -104,6 +107,7 @@ int Init::getArguments(int argc, char *argv[]) {
             cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
             exit(1);
         }
+        dirHeader = dir;
 
         struct Header *pHeader = (struct Header *) dir;
         pHeader -> i = i_rec;
@@ -183,10 +187,7 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> indice = i;
             arg -> q_rec = q_rec;
             pthread_create(&hilosEntrada[i], NULL, routineThread, arg);
-        }
-        for (int i = 0; i < i_rec; i++) {
-            pthread_join(hilosEntrada[i_rec], NULL);
-        }   
+        }  
 
         pthread_t hilosInternos[3];
         for(int i = 0; i < 3; i++){
@@ -195,11 +196,17 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> llenoInternos = arraySemLlenosInterno[i];
             arg -> mutexInternos = arraySemMutexInterno[i];
             arg -> typeQueue = i;
+            arg -> dirHeader = dirHeader;
+            arg -> cola = colas[i_rec+1];
             pthread_create(&hilosInternos[i], NULL, routineInternos, arg);
         }
+
         for (int i = 0; i < i_rec; i++) {
-            pthread_join(hilosInternos[i_rec], NULL);
+            pthread_join(hilosEntrada[i], NULL);
         } 
+        for (int i = 0; i < 3; i++) {
+            pthread_join(hilosInternos[i], NULL);
+        }
 
         close(fd);
     } else {
@@ -226,7 +233,7 @@ void* routineThread(void *inbox){
             sem_wait(arraySemVaciosInterno[0]);
             sem_wait(arraySemMutexInterno[0]);
             
-            while(queueSkin.size() >= arg->q_rec) {
+            while(queueSkin.size() >= (unsigned) arg->q_rec) {
                 //Cola llena
             }
             cout << copy->id << copy->i << copy->k << copy->q << endl; 
@@ -240,7 +247,7 @@ void* routineThread(void *inbox){
             sem_wait(arraySemVaciosInterno[1]);
             sem_wait(arraySemMutexInterno[1]);
 
-            while(queueBlood.size() >= arg->q_rec) {
+            while(queueBlood.size() >= (unsigned) arg->q_rec) {
                 //Cola llena
             }
             cout << copy->id << copy->i << copy->k << copy->q << endl; 
@@ -254,7 +261,7 @@ void* routineThread(void *inbox){
             sem_wait(arraySemVaciosInterno[2]);
             sem_wait(arraySemMutexInterno[2]);
             
-            while(queueDetritos.size() >= arg->q_rec) {
+            while(queueDetritos.size() >= (unsigned) arg->q_rec) {
                 //Cola llena
             }
             cout << copy->id << copy->i << copy->k << copy->q << endl; 
@@ -276,7 +283,48 @@ void* routineThread(void *inbox){
 
 void* routineInternos(void *inbox) {
     struct argInternos *arg = (argInternos*) inbox;
+    struct Header *pHeader = (struct Header *) arg -> dirHeader;
     do {
+        struct Exam examen;
+        sem_wait(arg -> llenoInternos);
+        sem_wait(arg -> mutexInternos);
+
+        Exam *copy = (struct Exam*) arg -> cola + (sizeof(struct Exam) * num_exams1[arg->typeQueue]);
+        if (arg->typeQueue == 0) {
+            // Skin
+            examen = queueSkin.front();
+            queueSkin.pop();
+
+            // Procesar Muestra
+            srand(time(NULL));
+            for (int i = 0; i < examen.q; i++) {
+                int randomSample = rand() % (25-8 +1) + 8;
+                pHeader -> s -= randomSample;
+            }
+            
+            // Obtencion resultado
+            int randomResult = rand() % (50-0 +1) + 0;
+            if (randomResult <= 15) {
+                examen.r = '?';
+            } else if (randomResult > 15 && randomResult <= 35) {
+                examen.r = 'N';
+            } else if (randomResult > 35 && randomResult <= 50) {
+                examen.r = 'P';
+            }
+            
+            // Tiempo de procesamiento
+            int randomTime = rand() % 10;
+
+            
+        } else if (arg->typeQueue == 1) {
+            // Blood
+            
+        } else if (arg->typeQueue == 2) {
+            // Detritos
+            
+        } 
         
+        sem_post(arg -> mutexInternos);
+        sem_post(arg -> vaciosInternos);
     } while (true);
 }

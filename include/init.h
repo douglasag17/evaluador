@@ -16,6 +16,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <queue>
+#include <time.h>
 #include "struct.h"
 
 class Init {
