@@ -241,7 +241,11 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
         sem_wait(arraySemMutex[inbox]);
 
         Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam) * num_exams[inbox];
-
+        //Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam);
+        //while(copy->q != 0){
+        //    cout << "en ciclo" << endl;
+        //    copy = (struct Exam*) ((char*) copy) + sizeof(struct Exam);
+        //}
         // initialize queues
         copy->id = id;
         copy->i = inbox;
@@ -249,12 +253,10 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
         copy->q = amount_sample;
         if(num_exams[inbox] < ie_rec) num_exams[inbox]+=1;
         else num_exams[inbox] = 0;
-        
         int id = Reg::id;
         if (isFile) { 
             ids_file += to_string(id) + "\n";
         } else cout << id << endl;
-        //cout << colas[inbox]->i << colas[inbox]->id << colas[inbox]->k << colas[inbox]->q << endl;
         Reg::id++;
 
         sem_post(arraySemMutex[inbox]);

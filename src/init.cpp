@@ -7,6 +7,8 @@ Init::Init(){}
 Init::~Init(){}
 void* routineThread(void *inbox);
 Exam **colas;
+int *num_exams1;
+int ie_rec = 0;
 queue <struct Exam> queueBlood;
 queue <struct Exam> queueSkin;
 queue <struct Exam> queueDetritos;
@@ -16,10 +18,11 @@ struct argHilo {
     sem_t* lleno;
     sem_t* mutex;
     Exam *cola;
+    int indice;
 };
 
 int Init::getArguments(int argc, char *argv[]) {
-    int i_rec, ie_rec, oe_rec, b_rec, d_rec, s_rec, q_rec;
+    int i_rec, oe_rec, b_rec, d_rec, s_rec, q_rec;
     string n_rec;
     if(argc >= 10) {
         for(int i = 1; i < argc; ++i) {
@@ -133,14 +136,9 @@ int Init::getArguments(int argc, char *argv[]) {
         for(int i = 1; i < i_rec; i++){
             colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
         }
-        /*sleep(15);
-        int i = 0;
-        while(i < ie_rec){
-            Exam *copy = (struct Exam*)((char*)colas[0]) + sizeof(struct Exam)*i;
-            cout << i << ": "<< copy->id << endl;
-            i++;
-            sleep(2);
-        }*/
+
+        num_exams1 = new int[i_rec];
+        for(int i = 0; i < i_rec; i++) num_exams1[i] = 0;
         
         pthread_t hilosEntrada[i_rec];
         for(int i = 0; i < i_rec; i++){
@@ -149,15 +147,11 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> lleno = arraySemLlenos[i];
             arg -> mutex = arraySemMutex[i];
             arg -> cola = colas[i];
+            arg -> indice = i;
             pthread_create(&hilosEntrada[i], NULL, routineThread, arg);
             //pthread_join(hilosEntrada[i_rec], NULL);
         }
-        //sem_wait(arraySemLlenos[]);
-        //sem_wait(arraySemMutex[]);
 
-
-        //sem_post(arraySemMutex[]);
-        //sem_post(arraySemVacios[]);
         close(fd);
     } else {
         cout << "Invalid number of arguments." << endl;
@@ -173,22 +167,29 @@ void* routineThread(void *inbox){
         // verificar si hay algo en la cola
         sem_wait(arg -> lleno);
         sem_wait(arg -> mutex);
-        Exam *copy = (struct Exam*) arg -> cola;
-        //cout << copy -> id << " " << copy->i << " " << copy->k << copy->q <<endl;
+        Exam *copy = (struct Exam*) arg -> cola + (sizeof(struct Exam) * num_exams1[arg->indice]);
         examen.id = copy->id;
         examen.i = copy->i;
         examen.k = copy->k;
         examen.q = copy->q;
         if(copy->k == 'S'){
+            cout << copy->id << copy->i << copy->k << copy->q << endl; 
             queueSkin.push(examen);
+            copy -> q = 0;
             cout << "Skin" << endl;
         }else if(copy->k == 'B'){
+            cout << copy->id << copy->i << copy->k << copy->q << endl; 
             queueBlood.push(examen);
+            copy -> q = 0;
             cout << "Blood" << endl;
         }else if(copy->k == 'D'){
+            cout << copy->id << copy->i << copy->k << copy->q << endl; 
             queueDetritos.push(examen);
+            copy -> q = 0;
             cout << "Detritos" << endl;
         }
+        if(num_exams1[arg->indice] < ie_rec) num_exams1[arg->indice]+=1;
+        else num_exams1[arg->indice] = 0;
         sem_post(arg -> mutex);
         sem_post(arg -> vacios);
 
