@@ -48,6 +48,27 @@ int Stop::getArguments(char *argv[]) {
             string realName(name.str());
             sem_unlink(&realName[0u]);
         }
+        semname = "vaciosInterno";
+        for (int j = 0; j < 3; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            sem_unlink(&realName[0u]);
+        }
+        semname = "llenosInterno";
+        for (int j = 0; j < 3; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            sem_unlink(&realName[0u]);
+        }
+        semname = "mutexInterno";
+        for (int j = 0; j < 3; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            sem_unlink(&realName[0u]);
+        }
 
         // deleting share memory
         shm_unlink(&nameShareMem[0u]);

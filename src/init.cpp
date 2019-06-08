@@ -6,6 +6,7 @@ using namespace std;
 Init::Init(){}
 Init::~Init(){}
 void* routineThread(void *inbox);
+void* routineInternos(void *inbox);
 Exam **colas;
 int *num_exams1;
 int ie_rec = 0;
@@ -20,6 +21,13 @@ struct argHilo {
     Exam *cola;
     int indice;
     int q_rec;
+};
+
+struct argInternos {
+    sem_t* vacios;
+    sem_t* lleno;
+    sem_t* mutex;
+    int typeQueue;
 };
 
 int Init::getArguments(int argc, char *argv[]) {
@@ -104,6 +112,7 @@ int Init::getArguments(int argc, char *argv[]) {
         pHeader -> d = d_rec;
         pHeader -> s = s_rec;
 
+        // creating semaphores
         string semname = "vacios";
         sem_t **arraySemVacios = new sem_t *[i_rec];
         for (int j = 0; j < i_rec; j++) {
@@ -112,7 +121,6 @@ int Init::getArguments(int argc, char *argv[]) {
             string realName(name.str());
             arraySemVacios[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
         }
-
         semname = "llenos";
         sem_t **arraySemLlenos = new sem_t *[i_rec];
         for (int j = 0; j < i_rec; j++) {
@@ -121,7 +129,6 @@ int Init::getArguments(int argc, char *argv[]) {
             string realName(name.str());
             arraySemLlenos[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 0);
         }
-
         semname = "mutex";
         sem_t **arraySemMutex = new sem_t *[i_rec];
         for (int j = 0; j < i_rec; j++) {
@@ -130,6 +137,31 @@ int Init::getArguments(int argc, char *argv[]) {
             string realName(name.str());
             arraySemMutex[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
         }
+        semname = "vaciosInterno";
+        sem_t **arraySemVaciosInterno = new sem_t *[i_rec];
+        for (int j = 0; j < 3; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemVaciosInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
+        }
+        semname = "llenosInterno";
+        sem_t **arraySemLlenosInterno = new sem_t *[i_rec];
+        for (int j = 0; j < 3; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemLlenosInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
+        }
+        semname = "mutexInterno";
+        sem_t **arraySemMutexInterno = new sem_t *[i_rec];
+        for (int j = 0; j < 3; j++) {
+            ostringstream name;
+            name << semname << j;
+            string realName(name.str());
+            arraySemMutexInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, ie_rec);
+        }
+
         munmap(dir, sizeof(struct Header));
         dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         colas = new Exam*[i_rec + 1];
@@ -137,7 +169,6 @@ int Init::getArguments(int argc, char *argv[]) {
         for(int i = 1; i < i_rec + 1; i++){
             colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
         }
-
         num_exams1 = new int[i_rec];
         for(int i = 0; i < i_rec; i++) num_exams1[i] = 0;
         
@@ -151,13 +182,23 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> indice = i;
             arg -> q_rec = q_rec;
             pthread_create(&hilosEntrada[i], NULL, routineThread, arg);
-            //pthread_join(hilosEntrada[i_rec], NULL);
         }
+        for (int i = 0; i < i_rec; i++) {
+            pthread_join(hilosEntrada[i_rec], NULL);
+        }   
 
         pthread_t hilosInternos[3];
         for(int i = 0; i < 3; i++){
-
+            struct argInternos *arg = new argInternos;
+            arg -> vacios = arraySemVaciosInterno[i];
+            arg -> lleno = arraySemLlenosInterno[i];
+            arg -> mutex = arraySemMutexInterno[i];
+            arg -> typeQueue = i;
+            pthread_create(&hilosInternos[i], NULL, routineInternos, arg);
         }
+        for (int i = 0; i < i_rec; i++) {
+            pthread_join(hilosInternos[i_rec], NULL);
+        } 
 
         close(fd);
     } else {
@@ -208,6 +249,14 @@ void* routineThread(void *inbox){
         else num_exams1[arg->indice] = 0;
         sem_post(arg -> mutex);
         sem_post(arg -> vacios);
+    } while (true);
+    
+}
+
+void* routineInternos(void *inbox) {
+    struct argInternos *arg = (argInternos*) inbox;
+    do {
+        
     } while (true);
     
 }
