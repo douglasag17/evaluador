@@ -188,11 +188,10 @@ void* routineThread(void *inbox){
             copy -> q = 0;
             cout << "Detritos" << endl;
         }
-        if(num_exams1[arg->indice] < ie_rec) num_exams1[arg->indice]+=1;
+        if(num_exams1[arg->indice] < ie_rec-1) num_exams1[arg->indice]+=1;
         else num_exams1[arg->indice] = 0;
         sem_post(arg -> mutex);
         sem_post(arg -> vacios);
-
     } while (true);
     
 }

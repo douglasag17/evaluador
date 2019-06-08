@@ -240,25 +240,23 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
         sem_wait(arraySemVacios[inbox]);
         sem_wait(arraySemMutex[inbox]);
 
+        cout << "n_exam" <<num_exams[inbox] << endl;
         Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam) * num_exams[inbox];
-        //Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam);
-        //while(copy->q != 0){
-        //    cout << "en ciclo" << endl;
-        //    copy = (struct Exam*) ((char*) copy) + sizeof(struct Exam);
-        //}
         // initialize queues
-        copy->id = id;
-        copy->i = inbox;
-        copy->k = sample[0u];
-        copy->q = amount_sample;
-        if(num_exams[inbox] < ie_rec) num_exams[inbox]+=1;
-        else num_exams[inbox] = 0;
-        int id = Reg::id;
-        if (isFile) { 
-            ids_file += to_string(id) + "\n";
-        } else cout << id << endl;
-        Reg::id++;
-
+        cout << "lo del reg "<< copy->q << " " << endl;
+        if(copy->q == 0){
+            copy->id = id;
+            copy->i = inbox;
+            copy->k = sample[0u];
+            copy->q = amount_sample;
+            if(num_exams[inbox] < ie_rec-1) num_exams[inbox]+=1;
+            else num_exams[inbox] = 0;
+            int id = Reg::id;
+            if (isFile) { 
+                ids_file += to_string(id) + "\n";
+            } else cout << id << endl;
+            Reg::id++;
+        }
         sem_post(arraySemMutex[inbox]);
         sem_post(arraySemLlenos[inbox]);
     }    
