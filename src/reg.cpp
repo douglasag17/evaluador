@@ -46,7 +46,6 @@ int Reg::getArguments(int argc, char *argv[])  {
             }
             num_exams = new int[i_rec];
             for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
-            
             // interactive mode
             string registers;
             cout << "> ";
@@ -68,7 +67,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                 if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                     cout << "invalid parameters" << endl;
                 }else{
-                    openMem(false, nameShareMem,inbox, sample, amount_sample, i_rec, ie_rec);
+                    openMem(false, inbox, sample, amount_sample, i_rec, ie_rec);
                 }
                 cout << "> ";
             }
@@ -126,7 +125,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                openMem(true ,nameShareMem, inbox, sample, amount_sample, i_rec, ie_rec);
+                                openMem(true, inbox, sample, amount_sample, i_rec, ie_rec);
                             }
                         }
                         ofstream outFile;
@@ -189,7 +188,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
                             }else{
-                                openMem(true, nameShareMem, inbox, sample, amount_sample, i_rec, ie_rec);
+                                openMem(true, inbox, sample, amount_sample, i_rec, ie_rec);
                             }
                         }
                         ofstream outFile;
@@ -209,7 +208,7 @@ int Reg::getArguments(int argc, char *argv[])  {
     return 0;
 }
 
-void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int amount_sample, int i_rec, int ie_rec){
+void Reg::openMem(bool isFile, int inbox, char *sample, int amount_sample, int i_rec, int ie_rec){
     if(inbox < i_rec){
         // opening semaphores
         string semname = "vacios";
@@ -239,11 +238,8 @@ void Reg::openMem(bool isFile, string nameShareMem, int inbox, char *sample, int
 
         sem_wait(arraySemVacios[inbox]);
         sem_wait(arraySemMutex[inbox]);
-
-        cout << "n_exam" <<num_exams[inbox] << endl;
         Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam) * num_exams[inbox];
         // initialize queues
-        cout << "lo del reg "<< copy->q << " " << endl;
         if(copy->q == 0){
             copy->id = id;
             copy->i = inbox;

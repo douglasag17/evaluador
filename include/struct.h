@@ -1,6 +1,6 @@
 #pragma once
 
-using namespace std;
+//using namespace std;
 
 struct Header{
   int i; // numero de colas de entrada
