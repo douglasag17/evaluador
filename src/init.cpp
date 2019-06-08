@@ -19,6 +19,7 @@ struct argHilo {
     sem_t* mutex;
     Exam *cola;
     int indice;
+    int q_rec;
 };
 
 int Init::getArguments(int argc, char *argv[]) {
@@ -131,9 +132,9 @@ int Init::getArguments(int argc, char *argv[]) {
         }
         munmap(dir, sizeof(struct Header));
         dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-        colas = new Exam*[i_rec];
+        colas = new Exam*[i_rec + 1];
         colas[0] = (struct Exam*) ((char *) dir) + sizeof(struct Header);
-        for(int i = 1; i < i_rec; i++){
+        for(int i = 1; i < i_rec + 1; i++){
             colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
         }
 
@@ -148,8 +149,14 @@ int Init::getArguments(int argc, char *argv[]) {
             arg -> mutex = arraySemMutex[i];
             arg -> cola = colas[i];
             arg -> indice = i;
+            arg -> q_rec = q_rec;
             pthread_create(&hilosEntrada[i], NULL, routineThread, arg);
             //pthread_join(hilosEntrada[i_rec], NULL);
+        }
+
+        pthread_t hilosInternos[3];
+        for(int i = 0; i < 3; i++){
+
         }
 
         close(fd);
@@ -173,16 +180,25 @@ void* routineThread(void *inbox){
         examen.k = copy->k;
         examen.q = copy->q;
         if(copy->k == 'S'){
+            while(queueSkin.size() >= arg->q_rec) {
+                //Cola llena
+            }
             cout << copy->id << copy->i << copy->k << copy->q << endl; 
             queueSkin.push(examen);
             copy -> q = 0;
             cout << "Skin" << endl;
         }else if(copy->k == 'B'){
+            while(queueBlood.size() >= arg->q_rec) {
+                //Cola llena
+            }
             cout << copy->id << copy->i << copy->k << copy->q << endl; 
             queueBlood.push(examen);
             copy -> q = 0;
             cout << "Blood" << endl;
         }else if(copy->k == 'D'){
+            while(queueDetritos.size() >= arg->q_rec) {
+                //Cola llena
+            }
             cout << copy->id << copy->i << copy->k << copy->q << endl; 
             queueDetritos.push(examen);
             copy -> q = 0;
