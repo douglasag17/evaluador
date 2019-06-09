@@ -1,5 +1,7 @@
 #include "rep.h"
 
+#include <time.h>
+
 using namespace std;
 
 Rep::Rep(){}
@@ -40,7 +42,35 @@ int Rep::getArguments(int argc, char *argv[])  {
         sem_t *mutexSalida = sem_open("mutexSalida", 1);
         
         if(flag2.compare("-i") == 0){
-            int time = atoi(argv[5]);
+            int waitTime = atoi(argv[5]);
+            while (true) {
+                sem_wait(llenosSalida);
+                sem_wait(mutexSalida);
+                struct Exam examen;
+                Exam *copy;
+                //sleep(waitTime); 
+                do{
+                    copy = (struct Exam*) ((char*) (colas[i_rec]) + sizeof(struct Exam) * num_exams2);
+                    if(copy->q != 0){
+                        examen.id = copy -> id;
+                        examen.i = copy -> i;
+                        examen.k = copy -> k;
+                        examen.q = copy -> q;
+                        examen.r = copy -> r;
+                        examen.p = copy -> p;
+                        examenesCola.push(examen);
+                        //examen = examenesCola.front();
+                        //cout << examen.id << " " << examen.i << " " << examen.k << " " << examen.r << endl;
+                        //examenesCola.pop();
+                        copy -> q = 0;
+                    }
+                    if(num_exams2 < oe_rec - 1) num_exams2 += 1;
+                    else num_exams2 = 0;
+                } while (num_exams2 < oe_rec - 1);
+                //Rep::printExams(examenesCola.size());
+                sem_post(mutexSalida);
+                sem_post(vaciosSalida);
+            }
 
         } else if(flag2.compare("-m") == 0) {
             int examenes = atoi(argv[5]);

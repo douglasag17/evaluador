@@ -298,120 +298,167 @@ void* routineInternos(void *inbox) {
         sem_wait(arg -> llenoInternos);
         sem_wait(arg -> mutexInternos);
         Exam *copy = (struct Exam*) ((char*) (arg -> cola) + sizeof(struct Exam) * numExamSalida);
-        cout << "Examen actual " << copy->id << " " << copy->q << endl;
+        //cout << "Examen actual " << copy->id << " " << copy->q << endl;
         if (arg->typeQueue == 0) {
             // Skin
+            bool procesadoSkin = false;
             examen = queueSkin.front();
-            cout << "pop" << endl;
-            queueSkin.pop();
             // Procesar Muestra
             srand(time(NULL));
+            int auxReactivoSkin = pHeader -> s;
             for (int i = 0; i < examen.q; i++) {
                 int randomSample = rand() % (25-8 +1) + 8;
-                pHeader -> s -= randomSample;
+                cout << "q " << examen.q << endl;
+                cout << "random " << randomSample << endl;
+                if (auxReactivoSkin >= randomSample) {
+                    auxReactivoSkin -= randomSample;
+                    procesadoSkin = true;
+                }else{
+                    procesadoSkin = false;
+                }
             }
-            // Obtencion resultado
-            int randomResult = rand() % (50-0 +1) + 0;
-            if (randomResult <= 15) {
-                examen.r = '?';
-            } else if (randomResult > 15 && randomResult <= 35) {
-                examen.r = 'N';
-            } else if (randomResult > 35 && randomResult <= 50) {
-                examen.r = 'P';
+            if(procesadoSkin){
+                // Obtencion resultado
+                pHeader -> s = auxReactivoSkin;
+                int randomResult = rand() % (50-0 +1) + 0;
+                if (randomResult <= 15) {
+                    examen.r = '?';
+                } else if (randomResult > 15 && randomResult <= 35) {
+                    examen.r = 'N';
+                } else if (randomResult > 35 && randomResult <= 50) {
+                    examen.r = 'P';
+                }
+                // Tiempo de procesamiento
+                int randomTime = rand() % 10;
+                examen.p = randomTime;
+                queueSkin.pop();
+                cout << "pop" << endl;
+                cout << "fin examen proceso " << endl;
+                sem_wait(vaciosSalida);
+                sem_wait(mutexSalida);            
+                // Agregar a la cola de salida
+                if(copy->q == 0) {
+                    copy -> id = examen.id;
+                    copy -> i = examen.i;
+                    copy -> k = examen.k;
+                    copy -> q = examen.q;
+                    copy -> r = examen.r;
+                    copy -> p = examen.p;
+                }
+                sem_post(mutexSalida);
+                sem_post(llenosSalida);
+            }else{
+                cout << "No procesado" << endl;
             }
-            // Tiempo de procesamiento
-            int randomTime = rand() % 10;
-            examen.p = randomTime;
-
-            sem_wait(vaciosSalida);
-            sem_wait(mutexSalida);  
-            // Agregar a la cola de salida
-            if(copy->q == 0) {
-                copy -> id = examen.id;
-                copy -> i = examen.i;
-                copy -> k = examen.k;
-                copy -> q = examen.q;
-                copy -> r = examen.r;
-                copy -> p = examen.p;
-            }
-            sem_post(mutexSalida);
-            sem_post(llenosSalida);
+            cout << "NIVEL REACTIVO S " << pHeader -> s << endl;
+            cout << "---------------------------------" << endl;
 
         } else if (arg->typeQueue == 1) {
             // Blood
+            bool procesadoBlood = false;
             examen = queueBlood.front();
-            cout << "pop" << endl;
-            queueBlood.pop();
             // Procesar Muestra
             srand(time(NULL));
+            int auxReactivoSangre = pHeader -> b;
             for (int i = 0; i < examen.q; i++) {
                 int randomSample = rand() % (7-1 +1) + 1;
-                pHeader -> b -= randomSample;
+                cout << "q " << examen.q << endl;
+                cout << "random " << randomSample << endl;
+                if (auxReactivoSangre >= randomSample) {
+                    auxReactivoSangre -= randomSample;
+                    procesadoBlood = true;
+                }else{
+                    procesadoBlood = false;
+                }
             }
-            // Obtencion resultado
-            int randomResult = rand() % (50-0 +1) + 0;
-            if (randomResult <= 15) {
-                examen.r = '?';
-            } else if (randomResult > 15 && randomResult <= 35) {
-                examen.r = 'N';
-            } else if (randomResult > 35 && randomResult <= 50) {
-                examen.r = 'P';
+            if(procesadoBlood){
+                // Obtencion resultado
+                pHeader -> b = auxReactivoSangre;
+                int randomResult = rand() % (50-0 +1) + 0;
+                if (randomResult <= 15) {
+                    examen.r = '?';
+                } else if (randomResult > 15 && randomResult <= 35) {
+                    examen.r = 'N';
+                } else if (randomResult > 35 && randomResult <= 50) {
+                    examen.r = 'P';
+                }
+                // Tiempo de procesamiento
+                int randomTime = rand() % 10;
+                examen.p = randomTime;
+                queueBlood.pop();
+                cout << "pop" << endl;
+                cout << "fin examen proceso " << endl;
+                sem_wait(vaciosSalida);
+                sem_wait(mutexSalida);            
+                // Agregar a la cola de salida
+                if(copy->q == 0) {
+                    copy -> id = examen.id;
+                    copy -> i = examen.i;
+                    copy -> k = examen.k;
+                    copy -> q = examen.q;
+                    copy -> r = examen.r;
+                    copy -> p = examen.p;
+                }
+                sem_post(mutexSalida);
+                sem_post(llenosSalida);
+            }else{
+                cout << "No procesado" << endl;
             }
-            // Tiempo de procesamiento
-            int randomTime = rand() % 10;
-            examen.p = randomTime;
-
-            sem_wait(vaciosSalida);
-            sem_wait(mutexSalida);            
-            // Agregar a la cola de salida
-            if(copy->q == 0) {
-                copy -> id = examen.id;
-                copy -> i = examen.i;
-                copy -> k = examen.k;
-                copy -> q = examen.q;
-                copy -> r = examen.r;
-                copy -> p = examen.p;
-            }
-            sem_post(mutexSalida);
-            sem_post(llenosSalida);
+            cout << "NIVEL REACTIVO B " << pHeader -> b << endl;
+            cout << "---------------------------------" << endl;
             
         } else if (arg->typeQueue == 2) {
             // Detritos
+            bool procesadoDetritos = false;
             examen = queueDetritos.front();            
-            cout << "pop" << endl;
-            queueDetritos.pop();
             // Procesar Muestra
             srand(time(NULL));
+            int auxReactivoDetritos = pHeader -> d;
             for (int i = 0; i < examen.q; i++) {
                 int randomSample = rand() % (20-5 +1) + 5;
-                pHeader -> d -= randomSample;
+                cout << "q " << examen.q << endl;
+                cout << "random " << randomSample << endl;
+                if (auxReactivoDetritos >= randomSample) {
+                    auxReactivoDetritos -= randomSample;
+                    procesadoDetritos = true;
+                }else{
+                    procesadoDetritos = false;
+                }
             }
-            // Obtencion resultado
-            int randomResult = rand() % (50-0 +1) + 0;
-            if (randomResult <= 15) {
-                examen.r = '?';
-            } else if (randomResult > 15 && randomResult <= 35) {
-                examen.r = 'N';
-            } else if (randomResult > 35 && randomResult <= 50) {
-                examen.r = 'P';
+            if(procesadoDetritos){
+                // Obtencion resultado
+                pHeader -> d = auxReactivoDetritos;
+                int randomResult = rand() % (50-0 +1) + 0;
+                if (randomResult <= 15) {
+                    examen.r = '?';
+                } else if (randomResult > 15 && randomResult <= 35) {
+                    examen.r = 'N';
+                } else if (randomResult > 35 && randomResult <= 50) {
+                    examen.r = 'P';
+                }
+                // Tiempo de procesamiento
+                int randomTime = rand() % 10;
+                examen.p = randomTime;
+                cout << "pop" << endl;
+                queueDetritos.pop();
+                sem_wait(vaciosSalida);
+                sem_wait(mutexSalida);  
+                // Agregar a la cola de salida
+                if(copy->q == 0) {
+                    copy -> id = examen.id;
+                    copy -> i = examen.i;
+                    copy -> k = examen.k;
+                    copy -> q = examen.q;
+                    copy -> r = examen.r;
+                    copy -> p = examen.p;
+                }
+                sem_post(mutexSalida);
+                sem_post(llenosSalida);
+            }else{
+                cout << "No procesado" << endl;
             }
-            // Tiempo de procesamiento
-            int randomTime = rand() % 10;
-            examen.p = randomTime;
-
-            sem_wait(vaciosSalida);
-            sem_wait(mutexSalida);  
-            // Agregar a la cola de salida
-            if(copy->q == 0) {
-                copy -> id = examen.id;
-                copy -> i = examen.i;
-                copy -> k = examen.k;
-                copy -> q = examen.q;
-                copy -> r = examen.r;
-                copy -> p = examen.p;
-            }
-            sem_post(mutexSalida);
-            sem_post(llenosSalida);
+            cout << "NIVEL REACTIVO D " << pHeader -> d << endl;
+            cout << "---------------------------------" << endl;
         }
         if(numExamSalida < arg -> oe_rec - 1) numExamSalida += 1;
         else numExamSalida = 0;
