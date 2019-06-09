@@ -7,6 +7,7 @@ using namespace std;
 Rep::Rep(){}
 Rep::~Rep(){}
 int num_exams2 = 0;
+int numExam = 0;
 queue <struct Exam> examenesCola;
 
 int Rep::getArguments(int argc, char *argv[])  {
@@ -37,9 +38,9 @@ int Rep::getArguments(int argc, char *argv[])  {
         for(int i = 0; i < i_rec + 1; i++){
             colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
         }
-        sem_t *vaciosSalida = sem_open("vaciosSalida", oe_rec);
+        sem_t *vaciosSalida = sem_open("vaciosSalida", 0);
         sem_t *llenosSalida = sem_open("llenosSalida", 0);
-        sem_t *mutexSalida = sem_open("mutexSalida", 1);
+        sem_t *mutexSalida = sem_open("mutexSalida", 0);
         
         if(flag2.compare("-i") == 0){
             int waitTime = atoi(argv[5]);
@@ -48,7 +49,6 @@ int Rep::getArguments(int argc, char *argv[])  {
                 sem_wait(mutexSalida);
                 struct Exam examen;
                 Exam *copy;
-                //sleep(waitTime); 
                 do{
                     copy = (struct Exam*) ((char*) (colas[i_rec]) + sizeof(struct Exam) * num_exams2);
                     if(copy->q != 0){
@@ -59,19 +59,17 @@ int Rep::getArguments(int argc, char *argv[])  {
                         examen.r = copy -> r;
                         examen.p = copy -> p;
                         examenesCola.push(examen);
-                        //examen = examenesCola.front();
-                        //cout << examen.id << " " << examen.i << " " << examen.k << " " << examen.r << endl;
-                        //examenesCola.pop();
+                        numExam++;
                         copy -> q = 0;
                     }
                     if(num_exams2 < oe_rec - 1) num_exams2 += 1;
                     else num_exams2 = 0;
                 } while (num_exams2 < oe_rec - 1);
-                //Rep::printExams(examenesCola.size());
                 sem_post(mutexSalida);
                 sem_post(vaciosSalida);
+                sleep(waitTime);
+                Rep::printExams(numExam);
             }
-
         } else if(flag2.compare("-m") == 0) {
             int examenes = atoi(argv[5]);
             while (true) {
@@ -114,4 +112,5 @@ void Rep::printExams(int examenes) {
         cout << examen.id << " " << examen.i << " " << examen.k << " " << examen.r << endl;
         examenesCola.pop();
     }
+    numExam = 0;
 }

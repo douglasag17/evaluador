@@ -441,6 +441,8 @@ void* routineInternos(void *inbox) {
                 examen.p = randomTime;
                 cout << "pop" << endl;
                 queueDetritos.pop();
+                cout << "pop" << endl;
+                cout << "fin examen proceso " << endl;
                 sem_wait(vaciosSalida);
                 sem_wait(mutexSalida);  
                 // Agregar a la cola de salida
