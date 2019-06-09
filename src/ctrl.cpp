@@ -15,6 +15,23 @@ int Ctrl::getArguments(int argc, char *argv[])  {
         }else{
             nameShareMem = argv[3];
         }
+
+        int fd = shm_open(nameShareMem.c_str(), O_RDWR, 0660);
+        if (fd < 0) {
+            cerr << "Error abriendo la memoria compartida: " << errno << strerror(errno) << endl;
+            exit(1);
+        }
+        void *dir;
+        if ((dir = mmap(NULL, sizeof(struct Header), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)) == MAP_FAILED) {
+            cerr << "Error mapeando la memoria compartida: " << errno << strerror(errno) << endl;
+            exit(1);
+        }
+        struct Header *pHeader = (struct Header *) dir;
+        int i_rec = pHeader -> i;
+        int oe_rec = pHeader ->oe;
+        int ie_rec = pHeader -> ie;
+        int q_rec = pHeader -> q;
+
         // Interactive mode, subcmds: list, update
         string sub_cmd;
         cout << "> ";
@@ -22,8 +39,12 @@ int Ctrl::getArguments(int argc, char *argv[])  {
             char *sample;
             int reactive_level;
             if (sub_cmd.compare("list processing") == 0) {
+                munmap(dir, sizeof(struct Header));
+                dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
                 cout << "processing" << endl;
             } else if (sub_cmd.compare("list waiting") == 0) {
+                munmap(dir, sizeof(struct Header));
+                dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
                 cout << "waiting" << endl;
             } else if (sub_cmd.compare("list reported") == 0) {
                 cout << "reported" << endl;
@@ -44,6 +65,15 @@ int Ctrl::getArguments(int argc, char *argv[])  {
                 sample = arr[1];
                 reactive_level = atoi(arr[2]);
                 if (reactive_level < 0) cout << "reactive level must be positive\n";
+                else{
+                    if(sample[0u] == 'B'){
+                        pHeader -> b += reactive_level;
+                    }else if(sample[0u] == 'S'){
+                        pHeader -> s += reactive_level;
+                    }else if(sample[0u] == 'D'){
+                        pHeader -> d += reactive_level;
+                    }
+                }
             } else {
                 cout << "command not found" << endl;
             }
