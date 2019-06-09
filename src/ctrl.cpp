@@ -71,9 +71,7 @@ int Ctrl::getArguments(int argc, char *argv[])  {
                     if(copy->q != 0){
                         cout << copy -> id << " " << copy -> i << " " << copy -> k << " " << copy -> r << endl;
                     }
-                
                 }
-
             } else if (sub_cmd.compare("list reactive") == 0) {
                 cout << "Blood level: " << pHeader -> b << endl;
                 cout << "Detritos level: " << pHeader -> d << endl;
