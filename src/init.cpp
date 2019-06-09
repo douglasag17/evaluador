@@ -317,7 +317,7 @@ void* routineInternos(void *inbox) {
                     procesadoSkin = false;
                 }
             }
-            if(procesadoSkin){
+            if(procesadoSkin && copy->q == 0){
                 // Obtencion resultado
                 pHeader -> s = auxReactivoSkin;
                 int randomResult = rand() % (50-0 +1) + 0;
@@ -335,16 +335,16 @@ void* routineInternos(void *inbox) {
                 cout << "pop" << endl;
                 cout << "fin examen proceso " << endl;
                 sem_wait(vaciosSalida);
-                sem_wait(mutexSalida);            
+                sem_wait(mutexSalida);   
+                         
                 // Agregar a la cola de salida
-                if(copy->q == 0) {
-                    copy -> id = examen.id;
-                    copy -> i = examen.i;
-                    copy -> k = examen.k;
-                    copy -> q = examen.q;
-                    copy -> r = examen.r;
-                    copy -> p = examen.p;
-                }
+                copy -> id = examen.id;
+                copy -> i = examen.i;
+                copy -> k = examen.k;
+                copy -> q = examen.q;
+                copy -> r = examen.r;
+                copy -> p = examen.p;
+                
                 sem_post(mutexSalida);
                 sem_post(llenosSalida);
             }else{
@@ -371,7 +371,7 @@ void* routineInternos(void *inbox) {
                     procesadoBlood = false;
                 }
             }
-            if(procesadoBlood){
+            if(procesadoBlood && copy->q == 0){
                 // Obtencion resultado
                 pHeader -> b = auxReactivoSangre;
                 int randomResult = rand() % (50-0 +1) + 0;
@@ -391,14 +391,12 @@ void* routineInternos(void *inbox) {
                 sem_wait(vaciosSalida);
                 sem_wait(mutexSalida);            
                 // Agregar a la cola de salida
-                if(copy->q == 0) {
-                    copy -> id = examen.id;
-                    copy -> i = examen.i;
-                    copy -> k = examen.k;
-                    copy -> q = examen.q;
-                    copy -> r = examen.r;
-                    copy -> p = examen.p;
-                }
+                copy -> id = examen.id;
+                copy -> i = examen.i;
+                copy -> k = examen.k;
+                copy -> q = examen.q;
+                copy -> r = examen.r;
+                copy -> p = examen.p;
                 sem_post(mutexSalida);
                 sem_post(llenosSalida);
             }else{
@@ -425,7 +423,7 @@ void* routineInternos(void *inbox) {
                     procesadoDetritos = false;
                 }
             }
-            if(procesadoDetritos){
+            if(procesadoDetritos && copy->q == 0){
                 // Obtencion resultado
                 pHeader -> d = auxReactivoDetritos;
                 int randomResult = rand() % (50-0 +1) + 0;
@@ -439,21 +437,18 @@ void* routineInternos(void *inbox) {
                 // Tiempo de procesamiento
                 int randomTime = rand() % 10;
                 examen.p = randomTime;
-                cout << "pop" << endl;
+                // Agregar a la cola de salida
+                sem_wait(vaciosSalida);
+                sem_wait(mutexSalida);  
+                copy -> id = examen.id;
+                copy -> i = examen.i;
+                copy -> k = examen.k;
+                copy -> q = examen.q;
+                copy -> r = examen.r;
+                copy -> p = examen.p;
                 queueDetritos.pop();
                 cout << "pop" << endl;
                 cout << "fin examen proceso " << endl;
-                sem_wait(vaciosSalida);
-                sem_wait(mutexSalida);  
-                // Agregar a la cola de salida
-                if(copy->q == 0) {
-                    copy -> id = examen.id;
-                    copy -> i = examen.i;
-                    copy -> k = examen.k;
-                    copy -> q = examen.q;
-                    copy -> r = examen.r;
-                    copy -> p = examen.p;
-                }
                 sem_post(mutexSalida);
                 sem_post(llenosSalida);
             }else{
