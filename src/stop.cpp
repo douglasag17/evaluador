@@ -69,6 +69,9 @@ int Stop::getArguments(char *argv[]) {
             string realName(name.str());
             sem_unlink(&realName[0u]);
         }
+        sem_unlink("vaciosSalida");
+        sem_unlink("llenosSalida");
+        sem_unlink("mutexSalida");
 
         // deleting share memory
         shm_unlink(&nameShareMem[0u]);

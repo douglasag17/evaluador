@@ -16,6 +16,9 @@ queue <struct Exam> queueDetritos;
 sem_t *arraySemVaciosInterno[3];
 sem_t *arraySemLlenosInterno[3];
 sem_t *arraySemMutexInterno[3];
+sem_t *vaciosSalida;
+sem_t *llenosSalida;
+sem_t *mutexSalida;
 struct argHilo {
     sem_t* vacios;
     sem_t* lleno;
@@ -166,6 +169,9 @@ int Init::getArguments(int argc, char *argv[]) {
             string realName(name.str());
             arraySemMutexInterno[j] = sem_open(realName.c_str(), O_CREAT | O_EXCL, 0660, 1);
         }
+        vaciosSalida = sem_open("vaciosSalida", O_CREAT | O_EXCL, 0660, oe_rec);
+        llenosSalida = sem_open("llenosSalida", O_CREAT | O_EXCL, 0660, 0);
+        mutexSalida = sem_open("mutexSalida", O_CREAT | O_EXCL, 0660, 1);
 
         munmap(dir, sizeof(struct Header));
         dir = mmap(NULL, sizeof(struct Header) + sizeof(struct Exam) * i_rec * ie_rec + sizeof(struct Exam) * oe_rec, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
