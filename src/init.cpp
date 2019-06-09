@@ -298,6 +298,7 @@ void* routineInternos(void *inbox) {
         sem_wait(arg -> llenoInternos);
         sem_wait(arg -> mutexInternos);
         Exam *copy = (struct Exam*) ((char*) (arg -> cola) + sizeof(struct Exam) * numExamSalida);
+        cout << "Examen actual " << copy->id << " " << copy->q << endl;
         if (arg->typeQueue == 0) {
             // Skin
             examen = queueSkin.front();

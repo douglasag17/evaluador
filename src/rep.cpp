@@ -10,7 +10,7 @@ int Rep::getArguments(int argc, char *argv[])  {
     string flag = argv[2];
     if (flag.compare("-n") == 0) {
         string nameShareMem = argv[3];
-        string flag2 = argv[3]; // -i int || -m int
+        string flag2 = argv[4]; // -i int || -m int
         
         int fd = shm_open(nameShareMem.c_str(), O_RDWR, 0660);
         if (fd < 0) {
@@ -38,26 +38,33 @@ int Rep::getArguments(int argc, char *argv[])  {
         sem_t *vaciosSalida = sem_open("vaciosSalida", oe_rec);
         sem_t *llenosSalida = sem_open("llenosSalida", 0);
         sem_t *mutexSalida = sem_open("mutexSalida", 1);
-        while (true) {
-            sem_wait(llenosSalida);
-            sem_wait(mutexSalida);
-            struct Exam examen;
-            Exam *copy = (struct Exam*) ((char*) (colas[i_rec]) + sizeof(struct Exam) * num_exams2);
-            examen.id = copy -> id;
-            examen.i = copy -> i;
-            examen.k = copy -> k;
-            examen.q = copy -> q;
-            examen.r = copy -> r;
-            examen.p = copy -> p;
-            cout << examen.id << " " << examen.i << " " << examen.k << " " << examen.r << endl;
-            copy -> q = 0;
-            if(num_exams2 < oe_rec - 1) num_exams2 += 1;
-            else num_exams2 = 0;
-            
-            sem_post(mutexSalida);
-            sem_post(vaciosSalida);
+        if(flag2.compare("-m") == 0){
+            int examenes = atoi(argv[5]);
+            while (true) {
+                sem_wait(llenosSalida);
+                sem_wait(mutexSalida);
+                struct Exam examen;
+                Exam *copy;
+                do{
+                    copy = (struct Exam*) ((char*) (colas[i_rec]) + sizeof(struct Exam) * num_exams2);
+                    if(copy->q != 0){
+                        examen.id = copy -> id;
+                        examen.i = copy -> i;
+                        examen.k = copy -> k;
+                        examen.q = copy -> q;
+                        examen.r = copy -> r;
+                        examen.p = copy -> p;
+                        cout << examen.id << " " << examen.i << " " << examen.k << " " << examen.r << endl;
+                        copy -> q = 0;
+                    }
+                    if(num_exams2 < oe_rec - 1) num_exams2 += 1;
+                    else num_exams2 = 0;
+                } while (num_exams2 < oe_rec - 1);
+                
+                sem_post(mutexSalida);
+                sem_post(vaciosSalida);
+            }
         }
-
 
     } else {
         cout << "incorrect flag" << endl;
