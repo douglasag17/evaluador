@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 #include <sstream>
 #include "struct.h"
+#include <queue>
 
 class Rep {
     public: 
@@ -21,4 +22,5 @@ class Rep {
     ~Rep();
     Exam **colas;
     int getArguments(int argc, char *argv[]);
+    void printExams(int examenes);
 };
