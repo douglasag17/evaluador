@@ -41,11 +41,7 @@ int Reg::getArguments(int argc, char *argv[])  {
             //Code to create queues
             Reg::colas = new Exam*[i_rec+1];
             for(int i = 0; i < i_rec + 1; i++){
-                if(i == i_rec){
-                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
-                }else{
-                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
-                }
+                colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
             }
             num_exams = new int[i_rec];
             for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
@@ -98,11 +94,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                 //Code to create queues
                 Reg::colas = new Exam*[i_rec+1];
                 for(int i = 0; i < i_rec + 1; i++){
-                    if(i == i_rec){
-                        colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
-                    }else{
-                        colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
-                    }
+                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
                 }
                 num_exams = new int[i_rec];
                 for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
@@ -165,11 +157,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                     //Code to create queues
                     Reg::colas = new Exam*[i_rec+1];
                     for(int i = 0; i < i_rec + 1; i++){
-                        if(i == i_rec){
-                            colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
-                        }else{
-                            colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
-                        }
+                        colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
                     }
                     num_exams = new int[i_rec];
                     for(int i = 0; i < i_rec; i++) num_exams[i] = 0;
@@ -247,7 +235,7 @@ void Reg::openMem(bool isFile, int inbox, char *sample, int amount_sample, int i
 
         sem_wait(arraySemVacios[inbox]);
         sem_wait(arraySemMutex[inbox]);
-        Exam *copy = (struct Exam*)((char*)colas[inbox]) + sizeof(struct Exam) * num_exams[inbox];
+        Exam *copy = (struct Exam*) ((char*) (colas[inbox]) + sizeof(struct Exam) * num_exams[inbox]);
         // initialize queues
         if(copy->q == 0){
             copy->id = id;

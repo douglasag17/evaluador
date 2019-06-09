@@ -168,17 +168,13 @@ int Init::getArguments(int argc, char *argv[]) {
         }
 
         munmap(dir, sizeof(struct Header));
-        dir = mmap(NULL, sizeof(struct Header) + (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+        dir = mmap(NULL, sizeof(struct Header) + sizeof(struct Exam) * i_rec * ie_rec + sizeof(struct Exam) * oe_rec, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         //Code to create queues
         colas = new Exam*[i_rec + 1];
         for(int i = 0; i < i_rec + 1; i++){
-            if(i == i_rec){
-                colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + ((sizeof(struct Exam) * ie_rec * i)));
-            }else{
-                colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
-            }
-            cout << "Dir cola test: " << colas[i] << endl;
+            colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
         }
+
         num_exams1 = new int[i_rec];
         for(int i = 0; i < i_rec; i++) num_exams1[i] = 0;
         
@@ -231,7 +227,7 @@ void* routineThread(void *inbox){
         sem_wait(arg -> lleno);
         sem_wait(arg -> mutex);
 
-        Exam *copy = (struct Exam*) arg -> cola + (sizeof(struct Exam) * num_exams1[arg->indice]);
+        Exam *copy = (struct Exam*) ((char*) (arg -> cola) + sizeof(struct Exam) * num_exams1[arg->indice]);
         examen.id = copy->id;
         examen.i = copy->i;
         examen.k = copy->k;
@@ -295,11 +291,11 @@ void* routineInternos(void *inbox) {
         struct Exam examen;
         sem_wait(arg -> llenoInternos);
         sem_wait(arg -> mutexInternos);
-        Exam *copy = (struct Exam*) arg -> cola + (sizeof(struct Exam) * numExamSalida);
-        cout << "Dir cola salida: "<< copy << " numExams: " << numExamSalida << endl; 
+        Exam *copy = (struct Exam*) ((char*) (arg -> cola) + sizeof(struct Exam) * numExamSalida);
         if (arg->typeQueue == 0) {
             // Skin
             examen = queueSkin.front();
+            cout << "pop" << endl;
             queueSkin.pop();
             // Procesar Muestra
             srand(time(NULL));
@@ -330,6 +326,7 @@ void* routineInternos(void *inbox) {
         } else if (arg->typeQueue == 1) {
             // Blood
             examen = queueBlood.front();
+            cout << "pop" << endl;
             queueBlood.pop();
             // Procesar Muestra
             srand(time(NULL));
@@ -359,7 +356,8 @@ void* routineInternos(void *inbox) {
             
         } else if (arg->typeQueue == 2) {
             // Detritos
-            examen = queueDetritos.front();
+            examen = queueDetritos.front();            
+            cout << "pop" << endl;
             queueDetritos.pop();
             // Procesar Muestra
             srand(time(NULL));
