@@ -321,13 +321,20 @@ void* routineInternos(void *inbox) {
             // Tiempo de procesamiento
             int randomTime = rand() % 10;
             examen.p = randomTime;
+
+            sem_wait(vaciosSalida);
+            sem_wait(mutexSalida);  
             // Agregar a la cola de salida
-            copy -> id = examen.id;
-            copy -> i = examen.i;
-            copy -> k = examen.k;
-            copy -> q = examen.q;
-            copy -> r = examen.r;
-            copy -> p = examen.p;
+            if(copy->q == 0) {
+                copy -> id = examen.id;
+                copy -> i = examen.i;
+                copy -> k = examen.k;
+                copy -> q = examen.q;
+                copy -> r = examen.r;
+                copy -> p = examen.p;
+            }
+            sem_post(mutexSalida);
+            sem_post(llenosSalida);
 
         } else if (arg->typeQueue == 1) {
             // Blood
@@ -352,13 +359,20 @@ void* routineInternos(void *inbox) {
             // Tiempo de procesamiento
             int randomTime = rand() % 10;
             examen.p = randomTime;
+
+            sem_wait(vaciosSalida);
+            sem_wait(mutexSalida);            
             // Agregar a la cola de salida
-            copy -> id = examen.id;
-            copy -> i = examen.i;
-            copy -> k = examen.k;
-            copy -> q = examen.q;
-            copy -> r = examen.r;
-            copy -> p = examen.p;
+            if(copy->q == 0) {
+                copy -> id = examen.id;
+                copy -> i = examen.i;
+                copy -> k = examen.k;
+                copy -> q = examen.q;
+                copy -> r = examen.r;
+                copy -> p = examen.p;
+            }
+            sem_post(mutexSalida);
+            sem_post(llenosSalida);
             
         } else if (arg->typeQueue == 2) {
             // Detritos
@@ -383,13 +397,20 @@ void* routineInternos(void *inbox) {
             // Tiempo de procesamiento
             int randomTime = rand() % 10;
             examen.p = randomTime;
+
+            sem_wait(vaciosSalida);
+            sem_wait(mutexSalida);  
             // Agregar a la cola de salida
-            copy -> id = examen.id;
-            copy -> i = examen.i;
-            copy -> k = examen.k;
-            copy -> q = examen.q;
-            copy -> r = examen.r;
-            copy -> p = examen.p;
+            if(copy->q == 0) {
+                copy -> id = examen.id;
+                copy -> i = examen.i;
+                copy -> k = examen.k;
+                copy -> q = examen.q;
+                copy -> r = examen.r;
+                copy -> p = examen.p;
+            }
+            sem_post(mutexSalida);
+            sem_post(llenosSalida);
         }
         if(numExamSalida < arg -> oe_rec - 1) numExamSalida += 1;
         else numExamSalida = 0;
