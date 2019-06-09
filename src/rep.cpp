@@ -91,7 +91,7 @@ int Rep::getArguments(int argc, char *argv[])  {
                     }
                     if(num_exams2 < oe_rec - 1) num_exams2 += 1;
                     else num_exams2 = 0;
-                    if(examenesCola.size() == examenes) Rep::printExams(examenes);
+                    if(examenesCola.size() == (unsigned) examenes) Rep::printExams(examenes);
                 } while (num_exams2 < oe_rec - 1);
                 
                 sem_post(mutexSalida);

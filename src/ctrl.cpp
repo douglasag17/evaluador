@@ -39,17 +39,31 @@ int Ctrl::getArguments(int argc, char *argv[])  {
             char *sample;
             int reactive_level;
             if (sub_cmd.compare("list processing") == 0) {
+                cout << "Processing: " << endl;
                 munmap(dir, sizeof(struct Header));
                 dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-                cout << "processing" << endl;
             } else if (sub_cmd.compare("list waiting") == 0) {
+                cout << "Waiting: " << endl;
                 munmap(dir, sizeof(struct Header));
                 dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-                cout << "waiting" << endl;
+                Ctrl::colas = new Exam*[i_rec+1];
+                for(int i = 0; i < i_rec + 1; i++){
+                    colas[i] = (struct Exam*) ((char *) ((char *) dir) + sizeof(struct Header) + (sizeof(struct Exam) * ie_rec * i));
+                }
+                for(int i = 0; i < i_rec; i++){
+                    for(int j = 0; j < ie_rec; j++){
+                        Exam *copy = (struct Exam*) ((char*) (colas[i]) + sizeof(struct Exam) * j);
+                        if(copy->q != 0){
+                            cout << copy -> id << " " << copy -> i << " " << copy -> k << " " << copy -> q << endl;
+                        }
+                    }
+                }
             } else if (sub_cmd.compare("list reported") == 0) {
                 cout << "reported" << endl;
             } else if (sub_cmd.compare("list reactive") == 0) {
-                cout << "reactive" << endl;
+                cout << "Blood level: " << pHeader -> b << endl;
+                cout << "Detritos level: " << pHeader -> d << endl;
+                cout << "Skin level: " << pHeader -> s << endl;
             } else if (sub_cmd.compare("list all") == 0) {
                 cout << "all" << endl;
             } else if (sub_cmd.find("update") != string::npos) {

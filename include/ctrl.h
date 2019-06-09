@@ -19,5 +19,6 @@ class Ctrl {
     public: 
     Ctrl();
     ~Ctrl();
+    Exam **colas;
     int getArguments(int argc, char *argv[]);
 };
