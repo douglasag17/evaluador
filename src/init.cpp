@@ -221,7 +221,6 @@ int Init::getArguments(int argc, char *argv[]) {
     } else {
         cout << "Invalid number of arguments." << endl;
     }
-    for(;;);
     return 0;
 }
 

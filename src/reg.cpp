@@ -65,7 +65,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                 amount_sample = atoi(arr[1]);
                 if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                     cout << "invalid parameters" << endl;
-                }else{
+                }else if (sample[0u] == 'B' || sample[0u] == 'D' || sample[0u] == 'S') {
                     openMem(false, inbox, sample, amount_sample, i_rec, ie_rec);
                 }
                 cout << "> ";
@@ -122,7 +122,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                             amount_sample = atoi(arr[1]);
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
-                            }else{
+                            }else if (sample[0u] == 'B' || sample[0u] == 'D' || sample[0u] == 'S'){
                                 openMem(true, inbox, sample, amount_sample, i_rec, ie_rec);
                             }
                         }
@@ -184,7 +184,7 @@ int Reg::getArguments(int argc, char *argv[])  {
                             amount_sample = atoi(arr[1]);
                             if (inbox < 0 || (amount_sample < 1 || amount_sample > 5)) {
                                 cout << "invalid parameters" << endl;
-                            }else{
+                            }else if (sample[0u] == 'B' || sample[0u] == 'D' || sample[0u] == 'S') {
                                 openMem(true, inbox, sample, amount_sample, i_rec, ie_rec);
                             }
                         }
