@@ -10,7 +10,7 @@ int num_exams2 = 0;
 int numExam = 0;
 queue <struct Exam> examenesCola;
 
-int Rep::getArguments(int argc, char *argv[])  {
+int Rep::getArguments(char *argv[])  {
     string flag = argv[2];
     if (flag.compare("-n") == 0) {
         string nameShareMem = argv[3];

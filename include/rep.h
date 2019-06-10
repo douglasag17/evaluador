@@ -21,6 +21,6 @@ class Rep {
     Rep();
     ~Rep();
     Exam **colas;
-    int getArguments(int argc, char *argv[]);
+    int getArguments(char *argv[]);
     void printExams(int examenes);
 };

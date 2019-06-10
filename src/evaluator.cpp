@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
         ctrl.getArguments(argc, argv);
     } else if (cmd.compare("rep") == 0) {
         Rep rep;
-        rep.getArguments(argc, argv);
+        rep.getArguments(argv);
     } else if (cmd.compare("stop") == 0) {
         Stop stop;
         stop.getArguments(argv);
