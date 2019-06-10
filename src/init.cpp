@@ -421,8 +421,6 @@ void* routineInternos(void *inbox) {
                 }
             }
             if(procesadoDetritos && copy->q == 0){
-                sem_post(arraySemMutexInterno[2]);
-                sem_post(arraySemVaciosInterno[2]);
                 // Obtencion resultado
                 pHeader -> d = auxReactivoDetritos;
                 int randomResult = rand() % (50-0 +1) + 0;
