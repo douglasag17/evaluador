@@ -315,6 +315,8 @@ void* routineInternos(void *inbox) {
             }
             if(procesadoSkin && copy->q == 0){
                 // Obtencion resultado
+                sem_post(arraySemMutexInterno[0]);
+                sem_post(arraySemVaciosInterno[0]);
                 pHeader -> s = auxReactivoSkin;
                 int randomResult = rand() % (50-0 +1) + 0;
                 if (randomResult <= 15) {
@@ -369,6 +371,8 @@ void* routineInternos(void *inbox) {
             }
             if(procesadoBlood && copy->q == 0){
                 // Obtencion resultado
+                sem_post(arraySemMutexInterno[1]);
+                sem_post(arraySemVaciosInterno[1]);
                 pHeader -> b = auxReactivoSangre;
                 int randomResult = rand() % (50-0 +1) + 0;
                 if (randomResult <= 15) {
@@ -421,6 +425,8 @@ void* routineInternos(void *inbox) {
             }
             if(procesadoDetritos && copy->q == 0){
                 // Obtencion resultado
+                sem_post(arraySemMutexInterno[2]);
+                sem_post(arraySemVaciosInterno[2]);
                 pHeader -> d = auxReactivoDetritos;
                 int randomResult = rand() % (50-0 +1) + 0;
                 if (randomResult <= 15) {
