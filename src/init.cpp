@@ -242,13 +242,12 @@ void* routineThread(void *inbox){
             sem_wait(arraySemVaciosInterno[0]);
             sem_wait(arraySemMutexInterno[0]);
             
-            while(queueSkin.size() >= (unsigned) arg->q_rec) {
-                //Cola llena
+            if(queueSkin.size() < (unsigned) arg->q_rec) {
+                cout << copy->id << copy->i << copy->k << copy->q << endl; 
+                queueSkin.push(examen);
+                copy -> q = 0;
+                cout << "Skin" << endl;              
             }
-            cout << copy->id << copy->i << copy->k << copy->q << endl; 
-            queueSkin.push(examen);
-            copy -> q = 0;
-            cout << "Skin" << endl;
 
             sem_post(arraySemMutexInterno[0]);
             sem_post(arraySemLlenosInterno[0]);
@@ -256,13 +255,12 @@ void* routineThread(void *inbox){
             sem_wait(arraySemVaciosInterno[1]);
             sem_wait(arraySemMutexInterno[1]);
 
-            while(queueBlood.size() >= (unsigned) arg->q_rec) {
-                //Cola llena
+            if(queueBlood.size() < (unsigned) arg->q_rec) {
+                cout << copy->id << copy->i << copy->k << copy->q << endl; 
+                queueBlood.push(examen);
+                copy -> q = 0;
+                cout << "Blood" << endl;        
             }
-            cout << copy->id << copy->i << copy->k << copy->q << endl; 
-            queueBlood.push(examen);
-            copy -> q = 0;
-            cout << "Blood" << endl;
 
             sem_post(arraySemMutexInterno[1]);
             sem_post(arraySemLlenosInterno[1]);
@@ -270,13 +268,12 @@ void* routineThread(void *inbox){
             sem_wait(arraySemVaciosInterno[2]);
             sem_wait(arraySemMutexInterno[2]);
             
-            while(queueDetritos.size() >= (unsigned) arg->q_rec) {
-                //Cola llena
+            if(queueDetritos.size() < (unsigned) arg->q_rec){
+                cout << copy->id << copy->i << copy->k << copy->q << endl; 
+                queueDetritos.push(examen);
+                copy -> q = 0;
+                cout << "Detritos" << endl;
             }
-            cout << copy->id << copy->i << copy->k << copy->q << endl; 
-            queueDetritos.push(examen);
-            copy -> q = 0;
-            cout << "Detritos" << endl;
 
             sem_post(arraySemMutexInterno[2]);
             sem_post(arraySemLlenosInterno[2]);
@@ -336,7 +333,7 @@ void* routineInternos(void *inbox) {
                 cout << "fin examen proceso " << endl;
                 sem_wait(vaciosSalida);
                 sem_wait(mutexSalida);   
-                         
+
                 // Agregar a la cola de salida
                 copy -> id = examen.id;
                 copy -> i = examen.i;
@@ -424,6 +421,8 @@ void* routineInternos(void *inbox) {
                 }
             }
             if(procesadoDetritos && copy->q == 0){
+                sem_post(arraySemMutexInterno[2]);
+                sem_post(arraySemVaciosInterno[2]);
                 // Obtencion resultado
                 pHeader -> d = auxReactivoDetritos;
                 int randomResult = rand() % (50-0 +1) + 0;
