@@ -29,6 +29,9 @@ int Ctrl::getArguments(int argc, char *argv[])  {
         int i_rec = pHeader -> i;
         int oe_rec = pHeader ->oe;
         int ie_rec = pHeader -> ie;
+        int sCopy = pHeader -> sCopy;
+        int bCopy = pHeader -> bCopy;
+        int dCopy = pHeader -> dCopy;
         munmap(dir, sizeof(struct Header));
         dir = mmap(NULL, (sizeof(struct Exam) * i_rec * ie_rec) + (sizeof(struct Exam) * oe_rec) + sizeof(struct Header) , PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
         Ctrl::colas = new Exam*[i_rec+1];
@@ -109,12 +112,34 @@ int Ctrl::getArguments(int argc, char *argv[])  {
                 reactive_level = atoi(arr[2]);
                 if (reactive_level < 0) cout << "reactive level must be positive\n";
                 else{
+                    int valor = 0;
                     if(sample[0u] == 'B'){
-                        pHeader -> b += reactive_level;
+                        if(pHeader -> b + reactive_level <= bCopy){
+                            pHeader -> b += reactive_level;
+                        }else{
+                            valor = reactive_level - (reactive_level - (bCopy-pHeader -> b));
+                            if(pHeader -> b + valor <= bCopy){
+                                pHeader -> b += valor;
+                            }  
+                        }
                     }else if(sample[0u] == 'S'){
-                        pHeader -> s += reactive_level;
+                        if(pHeader -> s + reactive_level <= sCopy){
+                            pHeader -> s += reactive_level;
+                        }else{
+                            valor = reactive_level - (reactive_level - (sCopy-pHeader -> s));
+                            if(pHeader -> s + valor <= sCopy){
+                                pHeader -> s += valor;
+                            }
+                        }
                     }else if(sample[0u] == 'D'){
-                        pHeader -> d += reactive_level;
+                        if(pHeader -> d + reactive_level <= dCopy){
+                            pHeader -> d += reactive_level;
+                        }else{
+                            valor = reactive_level - (reactive_level - (dCopy-pHeader -> d));
+                            if(pHeader -> d + valor <= dCopy){
+                                pHeader -> d += valor;
+                            }
+                        }
                     }
                 }
             } else {

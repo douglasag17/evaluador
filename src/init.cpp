@@ -122,7 +122,9 @@ int Init::getArguments(int argc, char *argv[]) {
         pHeader -> b = b_rec;
         pHeader -> d = d_rec;
         pHeader -> s = s_rec;
-
+        pHeader -> sCopy= s_rec;
+        pHeader -> bCopy= b_rec;
+        pHeader -> dCopy= d_rec;
         // creating semaphores
         string semname = "vacios";
         sem_t **arraySemVacios = new sem_t *[i_rec];

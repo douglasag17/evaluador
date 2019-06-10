@@ -10,6 +10,9 @@ struct Header{
   int b; // nivel de reactivo de sangre
   int d; // nivel de reactivo de detritos
   int s; // nivel de reactivo de piel
+  int sCopy;
+  int bCopy;
+  int dCopy;
 };
 
 //Entrada de una bandeja de entrada
