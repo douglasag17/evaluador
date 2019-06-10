@@ -238,13 +238,13 @@ void Reg::openMem(bool isFile, int inbox, char *sample, int amount_sample, int i
         Exam *copy = (struct Exam*) ((char*) (colas[inbox]) + sizeof(struct Exam) * num_exams[inbox]);
         // initialize queues
         if(copy->q == 0){
+            int id = Reg::id;
             copy->id = id;
             copy->i = inbox;
             copy->k = sample[0u];
             copy->q = amount_sample;
             if(num_exams[inbox] < ie_rec-1) num_exams[inbox]+=1;
             else num_exams[inbox] = 0;
-            int id = Reg::id;
             if (isFile) { 
                 ids_file += to_string(id) + "\n";
             } else cout << id << endl;
