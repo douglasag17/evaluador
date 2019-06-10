@@ -244,10 +244,8 @@ void* routineThread(void *inbox){
             sem_wait(arraySemMutexInterno[0]);
             
             if(queueSkin.size() < (unsigned) arg->q_rec) {
-                cout << copy->id << copy->i << copy->k << copy->q << endl; 
                 queueSkin.push(examen);
-                copy -> q = 0;
-                cout << "Skin" << endl;              
+                copy -> q = 0;         
             }
 
             sem_post(arraySemMutexInterno[0]);
@@ -257,10 +255,8 @@ void* routineThread(void *inbox){
             sem_wait(arraySemMutexInterno[1]);
 
             if(queueBlood.size() < (unsigned) arg->q_rec) {
-                cout << copy->id << copy->i << copy->k << copy->q << endl; 
                 queueBlood.push(examen);
-                copy -> q = 0;
-                cout << "Blood" << endl;        
+                copy -> q = 0;     
             }
 
             sem_post(arraySemMutexInterno[1]);
@@ -270,10 +266,8 @@ void* routineThread(void *inbox){
             sem_wait(arraySemMutexInterno[2]);
             
             if(queueDetritos.size() < (unsigned) arg->q_rec){
-                cout << copy->id << copy->i << copy->k << copy->q << endl; 
                 queueDetritos.push(examen);
                 copy -> q = 0;
-                cout << "Detritos" << endl;
             }
 
             sem_post(arraySemMutexInterno[2]);
@@ -296,7 +290,6 @@ void* routineInternos(void *inbox) {
         sem_wait(arg -> llenoInternos);
         sem_wait(arg -> mutexInternos);
         Exam *copy = (struct Exam*) ((char*) (arg -> cola) + sizeof(struct Exam) * numExamSalida);
-        //cout << "Examen actual " << copy->id << " " << copy->q << endl;
         if (arg->typeQueue == 0) {
             // Skin
             bool procesadoSkin = false;
@@ -306,8 +299,6 @@ void* routineInternos(void *inbox) {
             int auxReactivoSkin = pHeader -> s;
             for (int i = 0; i < examen.q; i++) {
                 int randomSample = rand() % (25-8 +1) + 8;
-                cout << "q " << examen.q << endl;
-                cout << "random " << randomSample << endl;
                 if (auxReactivoSkin >= randomSample) {
                     auxReactivoSkin -= randomSample;
                     procesadoSkin = true;
@@ -332,8 +323,6 @@ void* routineInternos(void *inbox) {
                 int randomTime = rand() % 10;
                 examen.p = randomTime;
                 queueSkin.pop();
-                cout << "pop" << endl;
-                cout << "fin examen proceso " << endl;
                 sem_wait(vaciosSalida);
                 sem_wait(mutexSalida);   
 
@@ -347,12 +336,7 @@ void* routineInternos(void *inbox) {
                 
                 sem_post(mutexSalida);
                 sem_post(llenosSalida);
-            }else{
-                cout << "No procesado" << endl;
             }
-            cout << "NIVEL REACTIVO S " << pHeader -> s << endl;
-            cout << "---------------------------------" << endl;
-
         } else if (arg->typeQueue == 1) {
             // Blood
             bool procesadoBlood = false;
@@ -362,8 +346,6 @@ void* routineInternos(void *inbox) {
             int auxReactivoSangre = pHeader -> b;
             for (int i = 0; i < examen.q; i++) {
                 int randomSample = rand() % (7-1 +1) + 1;
-                cout << "q " << examen.q << endl;
-                cout << "random " << randomSample << endl;
                 if (auxReactivoSangre >= randomSample) {
                     auxReactivoSangre -= randomSample;
                     procesadoBlood = true;
@@ -388,8 +370,6 @@ void* routineInternos(void *inbox) {
                 int randomTime = rand() % 10;
                 examen.p = randomTime;
                 queueBlood.pop();
-                cout << "pop" << endl;
-                cout << "fin examen proceso " << endl;
                 sem_wait(vaciosSalida);
                 sem_wait(mutexSalida);            
                 // Agregar a la cola de salida
@@ -401,11 +381,7 @@ void* routineInternos(void *inbox) {
                 copy -> p = examen.p;
                 sem_post(mutexSalida);
                 sem_post(llenosSalida);
-            }else{
-                cout << "No procesado" << endl;
             }
-            cout << "NIVEL REACTIVO B " << pHeader -> b << endl;
-            cout << "---------------------------------" << endl;
             
         } else if (arg->typeQueue == 2) {
             // Detritos
@@ -416,8 +392,6 @@ void* routineInternos(void *inbox) {
             int auxReactivoDetritos = pHeader -> d;
             for (int i = 0; i < examen.q; i++) {
                 int randomSample = rand() % (20-5 +1) + 5;
-                cout << "q " << examen.q << endl;
-                cout << "random " << randomSample << endl;
                 if (auxReactivoDetritos >= randomSample) {
                     auxReactivoDetritos -= randomSample;
                     procesadoDetritos = true;
@@ -451,15 +425,9 @@ void* routineInternos(void *inbox) {
                 copy -> r = examen.r;
                 copy -> p = examen.p;
                 queueDetritos.pop();
-                cout << "pop" << endl;
-                cout << "fin examen proceso " << endl;
                 sem_post(mutexSalida);
                 sem_post(llenosSalida);
-            }else{
-                cout << "No procesado" << endl;
             }
-            cout << "NIVEL REACTIVO D " << pHeader -> d << endl;
-            cout << "---------------------------------" << endl;
         }
         if(numExamSalida < arg -> oe_rec - 1) numExamSalida += 1;
         else numExamSalida = 0;
